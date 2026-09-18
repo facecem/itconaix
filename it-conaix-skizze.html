@@ -1,0 +1,748 @@
+<title>IT conAIX Skizze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,300..800;1,62..125,300..800&display=swap">
+<style>
+  :root{
+    --paper:#E8E8E4;
+    --paper-2:#DFDFDA;
+    --ink:#15181D;
+    --navy:#14264A;
+    --navy-2:#1B3260;
+    --navy-ink:#E9EDF3;
+    --navy-muted:#9FB0CC;
+    --muted:#5C6470;
+    --rule:#15181D;
+    --rule-soft:#C4C4BE;
+    --brick:#B5462C;
+    --brick-soft:#F0D6CC;
+    --ochre:#D9A441;
+    --ochre-soft:#F0E2C0;
+    --teal:#2E7C86;
+    --teal-soft:#D3E4E4;
+    --col:1200px;
+    --ease:cubic-bezier(.22,.8,.2,1);
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  p{margin:0}
+  h1,h2,h3{margin:0;font-weight:700;line-height:1;letter-spacing:-.025em;text-wrap:balance;font-stretch:88%}
+  .wrap{max-width:var(--col);margin:0 auto;padding:0 32px;position:relative}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .wide{font-stretch:112%;letter-spacing:.02em;font-weight:500;font-size:13px;color:var(--muted)}
+  .muted{color:var(--muted)}
+  :focus-visible{outline:2px solid var(--brick);outline-offset:3px}
+
+  /* ---------- Rules that draw themselves in ---------- */
+  .draw{position:relative;border-top-color:transparent!important}
+  .draw::before{content:"";position:absolute;left:0;top:0;height:1.5px;width:100%;background:var(--rule);
+    transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease)}
+  .draw.in::before{transform:scaleX(1)}
+  .on-dark .draw::before{background:rgba(233,237,243,.35)}
+
+  /* ---------- Entrance: content visible at rest; only slides ---------- */
+  .lift{transform:translateY(18px);transition:transform 1s var(--ease)}
+  .lift.in{transform:none}
+  .lift.d1{transition-delay:.08s}.lift.d2{transition-delay:.16s}.lift.d3{transition-delay:.24s}.lift.d4{transition-delay:.32s}
+
+  /* ---------- Page curtain ---------- */
+  .curtain{position:fixed;inset:0;z-index:60;background:var(--navy);transform:scaleY(0);transform-origin:bottom;pointer-events:none;
+    display:grid;place-items:center;color:var(--navy-ink)}
+  .curtain.up{transform:scaleY(1);transform-origin:bottom;transition:transform .48s var(--ease)}
+  .curtain.down{transform:scaleY(0);transform-origin:top;transition:transform .55s var(--ease)}
+  .curtain span{font-weight:800;font-size:clamp(1.4rem,3vw,2.2rem);letter-spacing:-.02em;font-stretch:85%;opacity:0;transition:opacity .25s}
+  .curtain.up span{opacity:1;transition-delay:.18s}
+
+  /* ---------- Marginal coordinates ---------- */
+  .coord{position:fixed;right:14px;top:50%;transform:translateY(-50%) rotate(90deg);
+    font-size:11.5px;font-stretch:112%;letter-spacing:.14em;color:var(--muted);pointer-events:none;z-index:15;white-space:nowrap;mix-blend-mode:multiply}
+  @media(max-width:1320px){.coord{display:none}}
+
+  /* ---------- Draft notice ---------- */
+  .draft{background:var(--ink);color:var(--paper);font-size:12.5px;padding:8px 0;font-stretch:110%;letter-spacing:.02em}
+  .draft .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .draft b{color:#F0A28E;font-weight:600}
+
+  /* ---------- Nav ---------- */
+  .nav{border-bottom:1.5px solid var(--rule);background:var(--paper);position:sticky;top:0;z-index:20;transition:box-shadow .3s}
+  .nav.scrolled{box-shadow:0 1px 0 var(--rule),0 12px 24px -20px rgba(21,24,29,.5)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;transition:height .3s var(--ease)}
+  .nav.scrolled .wrap{height:56px}
+  .wordmark{font-weight:800;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;font-stretch:95%}
+  .wordmark i{display:inline-block;width:14px;height:14px;background:var(--navy);position:relative;flex:none;transition:transform .35s var(--ease)}
+  .wordmark i::after{content:"";position:absolute;right:-5px;bottom:-5px;width:8px;height:8px;background:var(--brick);transition:transform .35s var(--ease)}
+  .wordmark i::before{content:"";position:absolute;left:-5px;top:-5px;width:6px;height:6px;background:var(--ochre);transition:transform .35s var(--ease)}
+  .wordmark:hover i{transform:rotate(90deg)}
+  .links{display:flex;gap:2px}
+  .links a{padding:10px 14px;font-size:15px;font-weight:500;position:relative;transition:color .15s;border-radius:2px}
+  .links a::after{content:"";position:absolute;left:14px;right:14px;bottom:4px;height:2px;background:var(--brick);
+    transform:scaleX(0);transform-origin:right;transition:transform .3s var(--ease)}
+  .links a:hover::after,.links a.on::after{transform:scaleX(1);transform-origin:left}
+  .links a:hover,.links a.on{color:var(--navy)}
+  .btn{display:inline-flex;align-items:center;padding:12px 20px;font-weight:600;font-size:15px;border-radius:2px;cursor:pointer;
+    border:1.5px solid var(--ink);transition:background .2s,color .2s,border-color .2s,transform .2s;font-family:inherit}
+  .btn:active{transform:translateY(1px)}
+  .btn-ink{background:var(--ink);color:var(--paper)}
+  .btn-ink:hover{background:var(--navy);border-color:var(--navy)}
+  .btn-line{background:transparent;color:var(--ink)}
+  .btn-line:hover{background:var(--ink);color:var(--paper)}
+  .btn-brick{background:var(--brick);border-color:var(--brick);color:#fff}
+  .btn-brick:hover{background:#9A3A24;border-color:#9A3A24}
+  .btn-ochre{background:var(--ochre);border-color:var(--ochre);color:var(--ink)}
+  .btn-ochre:hover{background:#E3B65C;border-color:#E3B65C}
+  .btn-paper{background:var(--paper);border-color:var(--paper);color:var(--ink)}
+  .btn-paper:hover{background:#fff;border-color:#fff}
+  .btn-paperline{background:transparent;border-color:rgba(233,237,243,.5);color:var(--navy-ink)}
+  .btn-paperline:hover{background:var(--paper);border-color:var(--paper);color:var(--ink)}
+  .burger{display:none;border:1.5px solid var(--ink);background:none;width:44px;height:44px;border-radius:2px;cursor:pointer;font-family:inherit;font-weight:600}
+  @media(max-width:820px){
+    .links{display:none;position:absolute;left:0;right:0;top:100%;background:var(--paper);border-bottom:1.5px solid var(--rule);flex-direction:column;padding:8px 20px 16px}
+    .links.open{display:flex}
+    .links a::after{left:14px;right:auto;width:28px}
+    .burger{display:block}
+    .nav .btn{display:none}
+  }
+
+  /* ---------- Pages / section tints ---------- */
+  .page{display:none}
+  .page.on{display:block}
+  section{padding:72px 0}
+  section.tight{padding:48px 0}
+  .on-dark{background:var(--navy);color:var(--navy-ink)}
+  .on-dark .muted{color:var(--navy-muted)}
+  .on-dark .wide{color:var(--navy-muted)}
+  .on-ochre{background:var(--ochre-soft)}
+  .on-teal{background:var(--teal-soft)}
+  .on-brick{background:var(--brick);color:#fff}
+  .on-brick .muted{color:#F3D9D0}
+
+  /* ---------- Hero with raster canvas ---------- */
+  .hero{position:relative;background:var(--navy);color:var(--navy-ink);padding:96px 0 80px;overflow:hidden;isolation:isolate}
+  .hero.sub{padding:72px 0 56px}
+  .hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
+  .hero .shade{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(90deg,rgba(20,38,74,.96) 0%,rgba(20,38,74,.88) 38%,rgba(20,38,74,.35) 70%,rgba(20,38,74,.05) 100%)}
+  @media(max-width:900px){.hero .shade{background:linear-gradient(180deg,rgba(20,38,74,.94) 0%,rgba(20,38,74,.86) 70%,rgba(20,38,74,.5) 100%)}}
+  .hero .wrap{z-index:2}
+  .hero h1{font-size:clamp(2.6rem,7vw,5.4rem);grid-column:1/10;font-stretch:82%;font-weight:800;color:#fff}
+  .hero.sub h1{font-size:clamp(2.2rem,5.6vw,4.2rem)}
+  .hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+  .hero h1 .w > span{display:inline-block;transform:translateY(110%);transition:transform .9s var(--ease)}
+  .hero h1.in .w > span{transform:none}
+  .hero .aside{grid-column:1/7;margin-top:28px;font-size:16px;line-height:1.55;color:var(--navy-muted);max-width:52ch}
+  .hero .aside strong{color:#fff;font-weight:700}
+  .hero .acts{grid-column:1/13;display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+  .hero .pill{position:absolute;right:32px;bottom:32px;z-index:2;display:flex;gap:6px;align-items:center;font-size:12.5px;font-stretch:110%;letter-spacing:.04em;color:var(--navy-muted)}
+  .hero .pill i{width:10px;height:10px;display:inline-block}
+  @media(max-width:900px){.hero h1{grid-column:1/13}.hero .aside{grid-column:1/13}.hero .pill{display:none}}
+
+  /* ---------- Three columns with colored bars ---------- */
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .three > div{padding-top:18px;font-size:15.5px;line-height:1.5;position:relative;border-top:4px solid var(--navy)}
+  .three > div:nth-child(2){border-top-color:var(--brick)}
+  .three > div:nth-child(3){border-top-color:var(--ochre)}
+  .three strong{display:block;font-weight:700;margin-bottom:6px;font-size:17px}
+  @media(max-width:720px){.three{grid-template-columns:1fr}}
+
+  /* ---------- Placeholder ---------- */
+  .ph{background:
+      repeating-linear-gradient(135deg,transparent 0 10px,rgba(21,24,29,.06) 10px 11px),var(--paper-2);
+    border:1.5px solid var(--rule);display:grid;place-items:center;text-align:center;
+    color:var(--muted);font-size:13.5px;font-stretch:108%;padding:16px;min-height:200px;position:relative;overflow:hidden;cursor:pointer}
+  .ph.navy{background:repeating-linear-gradient(135deg,transparent 0 10px,rgba(233,237,243,.07) 10px 11px),var(--navy-2);
+    border-color:rgba(233,237,243,.35);color:var(--navy-muted)}
+  .ph.teal{background:repeating-linear-gradient(135deg,transparent 0 10px,rgba(255,255,255,.12) 10px 11px),var(--teal);
+    border-color:var(--teal);color:#DCEEF0}
+  .ph span{max-width:26ch;line-height:1.45;position:relative;z-index:1}
+  .ph b{display:block;color:inherit;font-weight:700;margin-bottom:4px;font-stretch:100%}
+  .ph::after{content:"Ansehen";position:absolute;inset:0;background:var(--navy);color:var(--navy-ink);display:grid;place-items:center;
+    font-weight:700;font-size:1.2rem;clip-path:inset(100% 0 0 0);transition:clip-path .5s var(--ease);z-index:2}
+  .ph:hover::after{clip-path:inset(0 0 0 0)}
+  .ph.navy::after,.ph.teal::after{background:var(--brick);color:#fff}
+  .ph.still::after{display:none}.ph.still{cursor:default}
+
+  /* ---------- Service rows ---------- */
+  .rows{border-top:1.5px solid var(--rule)}
+  .row{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;padding:28px 0;border-bottom:1px solid var(--rule-soft);align-items:start;position:relative;isolation:isolate}
+  .row::before{content:"";position:absolute;inset:0 -32px;background:var(--navy);z-index:-1;transform:scaleY(0);transform-origin:bottom;transition:transform .42s var(--ease)}
+  .row:nth-child(2)::before{background:var(--teal)}
+  .row:nth-child(3)::before{background:var(--brick)}
+  .row:nth-child(4)::before{background:var(--ink)}
+  .row:hover::before{transform:scaleY(1);transform-origin:top}
+  .row,.row .m,.row .v ul{transition:color .3s}
+  .row:hover{color:#fff}
+  .row:hover .m,.row:hover .v ul{color:rgba(255,255,255,.7)}
+  .row:last-child{border-bottom:1.5px solid var(--rule)}
+  .row .k{grid-column:1/5;font-size:1.45rem;font-weight:700;letter-spacing:-.02em;line-height:1.1;font-stretch:88%;transition:transform .42s var(--ease);display:flex;gap:14px;align-items:flex-start}
+  .row .k i{width:12px;height:12px;flex:none;margin-top:.35em;background:var(--navy)}
+  .row:nth-child(2) .k i{background:var(--teal)}.row:nth-child(3) .k i{background:var(--brick)}.row:nth-child(4) .k i{background:var(--ochre)}
+  .row:hover .k{transform:translateX(10px)}
+  .row .v{grid-column:5/11;font-size:16.5px;line-height:1.55;max-width:58ch}
+  .row .v ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:15px}
+  .row .v ul li::before{content:"–";margin-right:8px}
+  .row .m{grid-column:11/13;text-align:right;font-size:14px;color:var(--muted);font-stretch:108%}
+  @media(max-width:820px){.row .k{grid-column:1/13}.row .v{grid-column:1/13}.row .m{grid-column:1/13;text-align:left}}
+
+  /* ---------- Section head ---------- */
+  .head{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:end;margin-bottom:32px}
+  .head h2{grid-column:1/8;font-size:clamp(1.9rem,4vw,2.9rem)}
+  .head .side{grid-column:8/13;font-size:15.5px;color:var(--muted);max-width:44ch;justify-self:end}
+  @media(max-width:820px){.head h2{grid-column:1/13}.head .side{grid-column:1/13;justify-self:start}}
+
+  /* ---------- Feature project ---------- */
+  .feature{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:stretch}
+  .feature .img{grid-column:1/9;min-height:420px}
+  .feature .txt{grid-column:9/13;display:flex;flex-direction:column;justify-content:space-between;gap:24px;padding:4px 0}
+  .feature h3{font-size:1.7rem}
+  .feature .fact{border-top:1.5px solid var(--rule);padding-top:12px;font-size:15px}
+  .feature .fact b{display:block;font-size:2.6rem;font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:6px;font-variant-numeric:tabular-nums;font-stretch:82%;color:var(--brick)}
+  @media(max-width:820px){.feature .img{grid-column:1/13;min-height:260px}.feature .txt{grid-column:1/13}}
+
+  /* ---------- Quote ---------- */
+  .quote{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .quote blockquote{grid-column:1/11;margin:0;font-size:clamp(1.5rem,3.4vw,2.5rem);font-weight:600;letter-spacing:-.02em;line-height:1.2;font-stretch:88%;text-wrap:balance;position:relative;padding-left:44px}
+  .quote blockquote::before{content:"„";position:absolute;left:0;top:-.1em;color:var(--brick);font-size:1.4em;font-weight:800;line-height:1}
+  .quote figcaption{grid-column:1/11;padding-left:44px;margin-top:18px;font-size:15px;color:var(--muted)}
+  .quote figcaption b{color:var(--ink);font-weight:600}
+
+  /* ---------- Work grid ---------- */
+  .work{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .work article{grid-column:span 6;display:flex;flex-direction:column;gap:14px}
+  .work article.big{grid-column:span 12}
+  .work article .ph{min-height:300px}
+  .work article.big .ph{min-height:460px}
+  .work h3{font-size:1.35rem}
+  .work .meta{display:flex;justify-content:space-between;gap:16px;font-size:14px;color:var(--muted);font-stretch:108%;border-top:1px solid var(--rule-soft);padding-top:10px}
+  .work .cat{display:inline-block;padding:3px 8px;font-size:12.5px;font-weight:600;font-stretch:108%;color:#fff;background:var(--navy)}
+  .work .cat.web{background:var(--teal)}.work .cat.betrieb{background:var(--brick)}.work .cat.dev{background:var(--navy)}
+  @media(max-width:820px){.work article{grid-column:span 12}.work article .ph,.work article.big .ph{min-height:240px}}
+
+  /* ---------- Process ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .step{padding:22px 20px 24px;background:var(--paper);border-top:5px solid var(--navy);position:relative}
+  .step:nth-child(2){border-top-color:var(--teal)}.step:nth-child(3){border-top-color:var(--ochre)}.step:nth-child(4){border-top-color:var(--brick)}
+  .step .n{font-size:13px;font-stretch:110%;color:var(--muted);letter-spacing:.02em}
+  .step h3{font-size:1.25rem;margin:8px 0 8px}
+  .step p{font-size:15px;line-height:1.5;color:var(--muted)}
+  .step .out{margin-top:14px;font-size:14px;border-left:3px solid var(--ink);padding-left:10px}
+  @media(max-width:820px){.steps{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.steps{grid-template-columns:1fr}}
+
+  /* ---------- About ---------- */
+  .about{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .about .txt{grid-column:1/7;font-size:1.05rem;line-height:1.6;display:flex;flex-direction:column;gap:18px;max-width:58ch}
+  .about .img{grid-column:8/13;min-height:440px}
+  @media(max-width:820px){.about .txt{grid-column:1/13}.about .img{grid-column:1/13;min-height:280px}}
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:56px}
+  .facts div{padding-top:14px;font-size:15px;border-top:4px solid var(--navy)}
+  .facts div:nth-child(2){border-top-color:var(--teal)}.facts div:nth-child(3){border-top-color:var(--ochre)}.facts div:nth-child(4){border-top-color:var(--brick)}
+  .facts b{display:block;font-weight:800;font-size:2.2rem;letter-spacing:-.03em;line-height:1;margin-bottom:8px;font-stretch:82%;font-variant-numeric:tabular-nums}
+  @media(max-width:720px){.facts{grid-template-columns:1fr 1fr}}
+
+  /* ---------- Contact ---------- */
+  .contact{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .contact .big{grid-column:1/7}
+  .contact .big a{display:block;font-size:clamp(1.5rem,3.4vw,2.4rem);font-weight:700;letter-spacing:-.02em;line-height:1.15;padding:14px 0;border-bottom:1px solid var(--rule-soft);font-stretch:88%;transition:padding-left .35s var(--ease),color .2s}
+  .contact .big a:first-child{border-top:1.5px solid var(--rule)}
+  .contact .big a:hover{color:var(--brick);padding-left:14px}
+  .contact .big .sub{font-size:14px;color:var(--muted);font-weight:400;font-stretch:108%;letter-spacing:0;display:block;margin-top:4px}
+  .contact form{grid-column:8/13;display:flex;flex-direction:column;gap:14px;background:#fff;padding:24px;border-top:5px solid var(--teal)}
+  .contact label{display:block;font-size:13.5px;font-stretch:108%;color:var(--muted);margin-bottom:6px}
+  .contact input,.contact textarea{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--rule-soft);background:var(--paper);border-radius:2px;color:var(--ink);transition:box-shadow .2s,border-color .2s}
+  .contact input:focus,.contact textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(46,124,134,.18)}
+  .contact textarea{min-height:130px;resize:vertical}
+  .contact .hint{font-size:13px;color:var(--muted)}
+  @media(max-width:820px){.contact .big{grid-column:1/13}.contact form{grid-column:1/13}}
+  .addr{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:56px}
+  .addr div{grid-column:span 4;font-size:15px;line-height:1.55;padding-top:14px;border-top:4px solid var(--navy)}
+  .addr div:nth-child(2){border-top-color:var(--ochre)}.addr div:nth-child(3){border-top-color:var(--brick)}
+  .addr b{display:block;font-weight:700;margin-bottom:4px}
+  @media(max-width:720px){.addr div{grid-column:span 12}}
+
+  /* ---------- CTA band ---------- */
+  .cta .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center}
+  .cta h2{grid-column:1/8;font-size:clamp(1.8rem,3.8vw,2.8rem)}
+  .cta .act{grid-column:9/13;display:flex;gap:10px;flex-wrap:wrap;justify-self:end}
+  @media(max-width:820px){.cta h2{grid-column:1/13}.cta .act{grid-column:1/13;justify-self:start}}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--ink);color:#B9BEC7;padding:40px 0 44px;font-size:14px}
+  footer .top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  footer nav{display:flex;gap:18px;flex-wrap:wrap}
+  footer a{position:relative}
+  footer a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1.5px;background:var(--ochre);transform:scaleX(0);transform-origin:right;transition:transform .3s var(--ease)}
+  footer a:hover{color:#fff}footer a:hover::after{transform:scaleX(1);transform-origin:left}
+  footer .swatch{display:flex;gap:4px}
+  footer .swatch i{width:14px;height:14px;display:block}
+
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{transition:none!important;animation:none!important}
+    .draw::before{transform:none}
+    .lift{transform:none}
+    .hero h1 .w > span{transform:none}
+    .curtain{display:none}
+  }
+</style>
+
+<div class="curtain" id="curtain" aria-hidden="true"><span id="curtain-label">Leistungen</span></div>
+<div class="coord" aria-hidden="true">Aachen — 50°46′35″ N · 6°05′02″ E</div>
+
+<div class="draft"><div class="wrap">
+  <span><b>Entwurf</b> — Skizze zum Durchklicken. Schraffierte Flächen sind Platzhalter für echte Fotos und Screenshots.</span>
+  <span>Stand 18.09.2026</span>
+</div></div>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="wordmark" href="#/" aria-label="IT conAIX Startseite"><i></i>IT conAIX</a>
+    <nav class="links" id="links" aria-label="Hauptnavigation">
+      <a href="#/" data-page="home">Start</a>
+      <a href="#/leistungen" data-page="leistungen">Leistungen</a>
+      <a href="#/arbeiten" data-page="arbeiten">Arbeiten</a>
+      <a href="#/ueber-uns" data-page="ueber">Über uns</a>
+      <a href="#/kontakt" data-page="kontakt">Kontakt</a>
+    </nav>
+    <a class="btn btn-ink" href="#/kontakt">Anfrage senden</a>
+    <button class="burger" id="burger" aria-label="Menü öffnen" aria-expanded="false">Menü</button>
+  </div>
+</header>
+
+<!-- ================= START ================= -->
+<main class="page" id="page-home" data-title="Start">
+  <section class="hero">
+    <canvas class="raster" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="wrap grid">
+      <h1 data-split>Wir bauen und betreiben die IT von Aachener Unternehmen. Und die Websites dazu.</h1>
+      <p class="aside lift d3"><strong>IT conAIX</strong> — Systembetreuung, Softwareentwicklung und Webdesign aus einer Werkstatt. Seit 2016 in Aachen, für Betriebe zwischen 5 und 150 Mitarbeitenden.</p>
+      <div class="acts lift d4"><a class="btn btn-brick" href="#/kontakt">Anfrage senden</a><a class="btn btn-paperline" href="#/arbeiten">Arbeiten ansehen</a></div>
+    </div>
+    <div class="pill"><i style="background:var(--teal)"></i><i style="background:var(--ochre)"></i><i style="background:var(--brick)"></i>&nbsp;Betrieb · Web · Software</div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="three">
+        <div class="lift d1"><strong>Betrieb</strong>Server, Netzwerk, Arbeitsplätze, Backups. Wir kümmern uns darum, dass es läuft – und sind da, wenn es nicht läuft.</div>
+        <div class="lift d2"><strong>Entwicklung</strong>Eigene Software, wo Standardlösungen nicht passen: Portale, Schnittstellen, Automatisierung.</div>
+        <div class="lift d3"><strong>Web</strong>Websites und Shops, die man findet, die schnell laden und die ihr selbst pflegen könnt.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="on-ochre">
+    <div class="wrap">
+      <div class="feature">
+        <div class="ph navy img lift"><span><b>Screenshot Projekt 1</b>z. B. Kundenportal, Startbildschirm, 1600 × 900</span></div>
+        <div class="txt">
+          <div class="lift d1">
+            <p class="wide">Ausgewählte Arbeit</p>
+            <h3 style="margin-top:10px">Kundenportal für einen Logistikbetrieb</h3>
+            <p class="muted" style="margin-top:12px;font-size:15.5px;line-height:1.55">Sendungen verfolgen, Rechnungen abrufen, Aufträge anlegen – ohne Anruf im Büro. Von uns entworfen, gebaut und seit 2024 im Betrieb.</p>
+          </div>
+          <div class="lift d2">
+            <div class="fact draw"><b><span data-count="40">0</span> %</b>weniger telefonische Rückfragen im ersten Halbjahr</div>
+            <a class="btn btn-ink" href="#/arbeiten" style="margin-top:20px">Alle Arbeiten</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="head">
+        <h2 class="lift">Was wir machen – und was nicht.</h2>
+        <p class="side lift d1">Vier Dinge, die wir gut können. Alles andere vermitteln wir ehrlich weiter.</p>
+      </div>
+      <div class="rows draw">
+        <div class="row"><div class="k"><i></i>Systembetreuung</div><div class="v">Laufender Betrieb eurer IT: Wartung, Updates, Monitoring, Backups, Hilfe bei Störungen. Fester Ansprechpartner, feste Reaktionszeit.</div><div class="m">ab 5 Arbeitsplätzen</div></div>
+        <div class="row"><div class="k"><i></i>Softwareentwicklung</div><div class="v">Portale, interne Tools, Schnittstellen zwischen Systemen, die sich sonst nicht verstehen. Sauber dokumentiert, damit ihr nicht von uns abhängig seid.</div><div class="m">Projekt oder Sprint</div></div>
+        <div class="row"><div class="k"><i></i>Webdesign</div><div class="v">Gestaltung und Umsetzung von Websites und Shops. Mit einem Redaktionssystem, das ihr ohne uns bedienen könnt.</div><div class="m">ab 4 Wochen</div></div>
+        <div class="row"><div class="k"><i></i>Beratung</div><div class="v">Bevor Geld ausgegeben wird: Was braucht ihr wirklich, was ist Marketing der Hersteller? Wir sind an keinen Anbieter gebunden.</div><div class="m">Stundensatz</div></div>
+      </div>
+      <a class="btn btn-line" href="#/leistungen" style="margin-top:28px">Leistungen im Detail</a>
+    </div>
+  </section>
+
+  <section class="on-teal tight">
+    <div class="wrap">
+      <figure class="quote">
+        <blockquote class="lift">Vorher haben wir bei jedem Ausfall drei Firmen angerufen und keine war zuständig. Jetzt rufen wir eine Nummer an und es geht jemand ran, der das System kennt.</blockquote>
+        <figcaption class="lift d1"><b>Platzhalter-Zitat</b> — Geschäftsführung eines Betreuungskunden, Aachen. Echtes Zitat mit Namen und Firma einsetzen.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="about">
+        <div class="txt">
+          <p class="wide lift">Über uns</p>
+          <h2 class="lift d1" style="font-size:clamp(1.7rem,3.4vw,2.5rem)">Vier Leute, eine Werkstatt in der Aachener Innenstadt.</h2>
+          <p class="lift d2">Wir sind Techniker, keine Verkäufer. Wer bei uns anruft, spricht mit jemandem, der die Systeme selbst betreut. Alles, was wir bauen, hosten wir in Deutschland und geben euch die Zugangsdaten.</p>
+          <a class="btn btn-line lift d3" href="#/ueber-uns" style="align-self:flex-start">Mehr über uns</a>
+        </div>
+        <div class="ph teal img lift d1"><span><b>Foto Team oder Werkstatt</b>echtes Foto, Tageslicht, keine Stockfotos</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta on-brick tight">
+    <div class="wrap">
+      <h2 class="lift">Habt ihr gerade ein IT-Problem oder ein Vorhaben? Ruft an.</h2>
+      <div class="act lift d1"><a class="btn btn-paper" href="#/kontakt">0241 000 000</a><a class="btn btn-ochre" href="#/kontakt">Anfrage senden</a></div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= LEISTUNGEN ================= -->
+<main class="page" id="page-leistungen" data-title="Leistungen">
+  <section class="hero sub">
+    <canvas class="raster" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="wrap grid">
+      <h1 data-split>Leistungen</h1>
+      <p class="aside lift d2">Wir übernehmen den Betrieb, bauen was fehlt und gestalten, was nach außen sichtbar ist. Preise stehen dabei, wo sie sich pauschal sagen lassen.</p>
+    </div>
+  </section>
+  <section>
+    <div class="wrap">
+      <div class="rows draw">
+        <div class="row">
+          <div class="k"><i></i>Systembetreuung</div>
+          <div class="v">Wir übernehmen den laufenden Betrieb eurer IT als fester Partner. Monatliche Pauschale pro Arbeitsplatz, Störungen sind inklusive. Reaktion innerhalb von 4 Stunden an Werktagen, Notfallnummer am Wochenende.
+            <ul><li>Server und Netzwerk</li><li>Arbeitsplätze und Drucker</li><li>Microsoft 365 / Nextcloud</li><li>Backups und Wiederherstellung</li><li>Monitoring und Updates</li><li>Benutzerverwaltung</li></ul>
+          </div>
+          <div class="m">ab 39 € / Platz / Monat</div>
+        </div>
+        <div class="row">
+          <div class="k"><i></i>Softwareentwicklung</div>
+          <div class="v">Wo Standardsoftware nicht passt, bauen wir das Passende: Kundenportale, interne Werkzeuge, Anbindungen an Warenwirtschaft, Buchhaltung oder Zeiterfassung. Ihr bekommt Quellcode, Dokumentation und Übergabe.
+            <ul><li>Web-Anwendungen</li><li>Schnittstellen (REST, SOAP, EDI)</li><li>Automatisierung von Abläufen</li><li>Datenmigration</li><li>Weiterentwicklung bestehender Systeme</li></ul>
+          </div>
+          <div class="m">Festpreis nach Konzept</div>
+        </div>
+        <div class="row">
+          <div class="k"><i></i>Webdesign</div>
+          <div class="v">Gestaltung und Umsetzung von Websites und Online-Shops. Barrierearm, schnell, für Suchmaschinen sauber aufgebaut. Mit Redaktionssystem und einer Schulung, damit ihr Texte und Bilder selbst pflegt.
+            <ul><li>Unternehmenswebsite</li><li>Online-Shop</li><li>Landingpages</li><li>Relaunch bestehender Seiten</li><li>Hosting und Pflege</li></ul>
+          </div>
+          <div class="m">ab 4.800 €</div>
+        </div>
+        <div class="row">
+          <div class="k"><i></i>Beratung</div>
+          <div class="v">Zweite Meinung vor Investitionen, Bestandsaufnahme bei Übernahmen, Begleitung bei Ausschreibungen. Wir verkaufen keine Hardware und keine Lizenzen, deshalb raten wir auch mal ab.
+            <ul><li>IT-Bestandsaufnahme</li><li>Anbieterauswahl</li><li>Datenschutz-Grundlagen</li><li>Schulungen</li></ul>
+          </div>
+          <div class="m">120 € / Stunde</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="on-ochre">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="lift">So läuft ein Projekt bei uns.</h2>
+        <p class="side lift d1">Vier Schritte, jeder mit einem Ergebnis, das ihr in der Hand habt.</p>
+      </div>
+      <div class="steps">
+        <div class="step lift d1"><div class="n">Schritt 1</div><h3>Gespräch</h3><p>Wir kommen vorbei, schauen uns an, was da ist, und hören zu, was stört.</p><div class="out">Ergebnis: Protokoll und grobe Einschätzung</div></div>
+        <div class="step lift d2"><div class="n">Schritt 2</div><h3>Konzept</h3><p>Was wird gebaut, was nicht, was kostet es. Bei Software mit klickbarem Entwurf.</p><div class="out">Ergebnis: Angebot mit Festpreis</div></div>
+        <div class="step lift d3"><div class="n">Schritt 3</div><h3>Umsetzung</h3><p>In Abschnitten von zwei Wochen. Nach jedem Abschnitt seht ihr einen Zwischenstand.</p><div class="out">Ergebnis: Lauffähige Version</div></div>
+        <div class="step lift d4"><div class="n">Schritt 4</div><h3>Übergabe und Betrieb</h3><p>Schulung, Dokumentation, Zugangsdaten. Danach betreuen wir weiter oder ihr übernehmt.</p><div class="out">Ergebnis: Ihr seid unabhängig</div></div>
+      </div>
+    </div>
+  </section>
+  <section class="cta on-dark tight">
+    <div class="wrap"><h2 class="lift">Nicht sicher, was ihr braucht? Das klären wir im ersten Gespräch.</h2><div class="act lift d1"><a class="btn btn-ochre" href="#/kontakt">Gespräch anfragen</a></div></div>
+  </section>
+</main>
+
+<!-- ================= ARBEITEN ================= -->
+<main class="page" id="page-arbeiten" data-title="Arbeiten">
+  <section class="hero sub">
+    <canvas class="raster" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="wrap grid">
+      <h1 data-split>Arbeiten</h1>
+      <p class="aside lift d2">Eine Auswahl aus den letzten Jahren. Bei jedem Projekt steht, was die Aufgabe war und was danach anders war. Auf Wunsch stellen wir den Kontakt zum Kunden her.</p>
+    </div>
+  </section>
+  <section>
+    <div class="wrap">
+      <div class="work">
+        <article class="big">
+          <div class="ph navy lift"><span><b>Screenshot Projekt 1 – Kundenportal</b>Startbildschirm nach Login, echter Zustand, 2000 × 900</span></div>
+          <div class="lift d1"><span class="cat dev">Softwareentwicklung</span></div>
+          <h3 class="lift d1">Kundenportal für einen Logistikbetrieb</h3>
+          <p class="muted lift d2" style="font-size:15.5px;max-width:64ch">Ein Spediteur mit 60 Mitarbeitenden bekam täglich hunderte Anrufe: „Wo ist meine Sendung?" Wir haben ein Portal gebaut, in dem Kunden Sendungen verfolgen, Rechnungen laden und Aufträge anlegen. Anbindung an die bestehende Speditionssoftware über Schnittstelle.</p>
+          <div class="meta lift d3"><span>Next.js · PostgreSQL · Schnittstelle zur Speditionssoftware</span><span>2024 – heute</span></div>
+        </article>
+        <article>
+          <div class="ph teal lift"><span><b>Screenshot Projekt 2 – Website</b>Startseite, Desktop, 1200 × 800</span></div>
+          <div class="lift d1"><span class="cat web">Webdesign</span></div>
+          <h3 class="lift d1">Website für eine Anwaltskanzlei</h3>
+          <p class="muted lift d2" style="font-size:15.5px">Relaunch mit klarer Struktur nach Rechtsgebieten, Terminanfrage online, Pflege durch das Sekretariat selbst. Ladezeit von 6 auf unter 1 Sekunde.</p>
+          <div class="meta lift d3"><span>Redaktionssystem · Hosting</span><span>2024</span></div>
+        </article>
+        <article>
+          <div class="ph lift d1"><span><b>Foto Projekt 3 – Serverraum</b>oder Netzwerkschrank nach Umbau</span></div>
+          <div class="lift d2"><span class="cat betrieb">Systembetreuung</span></div>
+          <h3 class="lift d2">IT-Übernahme einer Arztpraxis-Gruppe</h3>
+          <p class="muted lift d3" style="font-size:15.5px">Drei Standorte, gewachsene Technik, kein Backup. Bestandsaufnahme, Neuaufbau des Netzwerks, zentrale Datensicherung. Seit 2023 in laufender Betreuung, seitdem kein ungeplanter Ausfall.</p>
+          <div class="meta lift d4"><span>Netzwerk · Backup · Monitoring</span><span>2023 – heute</span></div>
+        </article>
+        <article>
+          <div class="ph teal lift"><span><b>Screenshot Projekt 4 – Shop</b>Produktseite, 1200 × 800</span></div>
+          <div class="lift d1"><span class="cat web">Webdesign</span> <span class="cat dev">Entwicklung</span></div>
+          <h3 class="lift d1">Online-Shop für eine Rösterei</h3>
+          <p class="muted lift d2" style="font-size:15.5px">Shop mit Abo-Funktion und Anbindung an die Buchhaltung. Die Inhaberin pflegt Sortiment und Preise selbst.</p>
+          <div class="meta lift d3"><span>Shop-System · Abo · Buchhaltungsanbindung</span><span>2025</span></div>
+        </article>
+        <article>
+          <div class="ph navy lift d1"><span><b>Screenshot Projekt 5 – Internes Tool</b>Übersicht oder Formular, 1200 × 800</span></div>
+          <div class="lift d2"><span class="cat dev">Softwareentwicklung</span></div>
+          <h3 class="lift d2">Zeiterfassung für einen Handwerksbetrieb</h3>
+          <p class="muted lift d3" style="font-size:15.5px">Stunden auf der Baustelle per Handy erfassen, Auswertung im Büro, Export in die Lohnbuchhaltung. Ersetzt Zettel und Excel.</p>
+          <div class="meta lift d4"><span>Web-App · Export Lohnbuchhaltung</span><span>2025</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="cta on-brick tight">
+    <div class="wrap"><h2 class="lift">Ähnliches Vorhaben? Wir zeigen euch die Projekte gern live.</h2><div class="act lift d1"><a class="btn btn-paper" href="#/kontakt">Termin anfragen</a></div></div>
+  </section>
+</main>
+
+<!-- ================= ÜBER UNS ================= -->
+<main class="page" id="page-ueber" data-title="Über uns">
+  <section class="hero sub">
+    <canvas class="raster" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="wrap grid">
+      <h1 data-split>Über uns</h1>
+      <p class="aside lift d2">Gegründet 2016 von zwei Technikern, heute vier Leute. Wir sitzen in der Aachener Innenstadt und fahren zu Kunden im Umkreis von etwa 50 Kilometern.</p>
+    </div>
+  </section>
+  <section>
+    <div class="wrap">
+      <div class="about">
+        <div class="txt">
+          <p class="lift">Der Name ist ein Wortspiel: <strong>Aix</strong> für Aachen, <strong>con</strong> für „mit". IT mit Aachen, IT mit euch. Dass da auch „AI" drinsteckt, ist uns erst später aufgefallen – wir setzen KI ein, wo sie Arbeit spart, und lassen sie weg, wo sie nur gut klingt.</p>
+          <p class="lift d1">Wir sind Techniker, keine Verkäufer. Wir verkaufen keine Hardware und keine Lizenzen und bekommen keine Provision. Deshalb können wir auch sagen: Das braucht ihr nicht.</p>
+          <p class="lift d2">Alles, was wir für euch bauen oder betreiben, liegt auf Servern in Deutschland. Ihr bekommt alle Zugangsdaten und die Dokumentation. Wenn ihr mal wechseln wollt, geht das ohne uns.</p>
+        </div>
+        <div class="ph teal img lift d1"><span><b>Foto: das Team</b>vor der Werkstatt oder am Arbeitsplatz, natürliches Licht</span></div>
+      </div>
+      <div class="facts">
+        <div class="lift d1"><b><span data-count="2016">0</span></b>gegründet in Aachen, seit 2021 in der Innenstadt</div>
+        <div class="lift d2"><b><span data-count="4">0</span></b>Personen: zwei Administratoren, ein Entwickler, eine Gestalterin</div>
+        <div class="lift d3"><b>~<span data-count="40">0</span></b>Kunden in laufender Betreuung, 5 bis 150 Arbeitsplätze</div>
+        <div class="lift d4"><b><span data-count="100">0</span> %</b>Hosting in Deutschland, Verträge nach deutschem Recht</div>
+      </div>
+    </div>
+  </section>
+  <section class="on-ochre">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="lift">Wer hier arbeitet.</h2>
+        <p class="side lift d1">Wer anruft, erreicht eine dieser vier Personen. Keine Hotline, keine Ticketnummer.</p>
+      </div>
+      <div class="work">
+        <article class="lift d1"><div class="ph navy" style="min-height:280px"><span><b>Porträt</b>Name, Rolle</span></div><h3>Name Nachname</h3><p class="muted" style="font-size:15px">Geschäftsführung, Systembetreuung. Seit 2016.</p></article>
+        <article class="lift d2"><div class="ph teal" style="min-height:280px"><span><b>Porträt</b>Name, Rolle</span></div><h3>Name Nachname</h3><p class="muted" style="font-size:15px">Softwareentwicklung. Seit 2018.</p></article>
+        <article class="lift d3"><div class="ph" style="min-height:280px"><span><b>Porträt</b>Name, Rolle</span></div><h3>Name Nachname</h3><p class="muted" style="font-size:15px">Gestaltung, Webdesign. Seit 2021.</p></article>
+        <article class="lift d4"><div class="ph navy" style="min-height:280px"><span><b>Porträt</b>Name, Rolle</span></div><h3>Name Nachname</h3><p class="muted" style="font-size:15px">Systembetreuung, Netzwerk. Seit 2023.</p></article>
+      </div>
+    </div>
+  </section>
+  <section class="cta on-dark tight">
+    <div class="wrap"><h2 class="lift">Kommt vorbei. Kaffee gibt's, Verkaufsgespräch nicht.</h2><div class="act lift d1"><a class="btn btn-ochre" href="#/kontakt">Adresse und Anfahrt</a></div></div>
+  </section>
+</main>
+
+<!-- ================= KONTAKT ================= -->
+<main class="page" id="page-kontakt" data-title="Kontakt">
+  <section class="hero sub">
+    <canvas class="raster" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="wrap grid">
+      <h1 data-split>Kontakt</h1>
+      <p class="aside lift d2">Anrufen ist am schnellsten. Werktags 8 bis 17 Uhr, im Notfall für Betreuungskunden rund um die Uhr.</p>
+    </div>
+  </section>
+  <section>
+    <div class="wrap">
+      <div class="contact">
+        <div class="big lift">
+          <a href="tel:+49241000000">0241 000 000<span class="sub">Werktags 8–17 Uhr</span></a>
+          <a href="mailto:hallo@conaix.de">hallo@conaix.de<span class="sub">Antwort am selben Werktag</span></a>
+          <a href="tel:+49241000001">0241 000 001<span class="sub">Notfallnummer, nur für Betreuungskunden</span></a>
+        </div>
+        <form class="lift d2" onsubmit="event.preventDefault();this.querySelector('.hint').textContent='Skizze: Formular ist noch nicht angebunden.'">
+          <div><label for="f-name">Name</label><input id="f-name" type="text" autocomplete="name"></div>
+          <div><label for="f-firma">Unternehmen</label><input id="f-firma" type="text" autocomplete="organization"></div>
+          <div><label for="f-mail">E-Mail oder Telefon</label><input id="f-mail" type="text" autocomplete="email"></div>
+          <div><label for="f-msg">Worum geht es?</label><textarea id="f-msg" placeholder="Zwei, drei Sätze reichen. Was stört, was soll anders werden?"></textarea></div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><button class="btn btn-brick" type="submit">Anfrage senden</button><span class="hint">Wir melden uns am selben Werktag.</span></div>
+        </form>
+      </div>
+      <div class="addr">
+        <div class="lift d1"><b>Werkstatt</b>IT conAIX GbR<br>Musterstraße 12<br>52062 Aachen</div>
+        <div class="lift d2"><b>Anfahrt</b>Zwei Minuten vom Bushof. Parken im Parkhaus Büchel, wir stempeln.</div>
+        <div class="lift d3"><b>Rechtliches</b><a href="#/kontakt">Impressum</a> · <a href="#/kontakt">Datenschutz</a><br>USt-IdNr. DE 000 000 000</div>
+      </div>
+      <div class="ph still lift" style="margin-top:40px;min-height:260px"><span><b>Karte</b>OpenStreetMap-Ausschnitt, Innenstadt Aachen, Marker</span></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="top">
+      <span>© 2026 IT conAIX GbR, Aachen</span>
+      <nav aria-label="Fußzeile"><a href="#/leistungen">Leistungen</a><a href="#/arbeiten">Arbeiten</a><a href="#/ueber-uns">Über uns</a><a href="#/kontakt">Kontakt</a><a href="#/kontakt">Impressum</a><a href="#/kontakt">Datenschutz</a></nav>
+      <span class="swatch" aria-hidden="true"><i style="background:var(--navy)"></i><i style="background:var(--teal)"></i><i style="background:var(--ochre)"></i><i style="background:var(--brick)"></i><i style="background:var(--paper)"></i></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var routes={'':'home','/':'home','/leistungen':'leistungen','/arbeiten':'arbeiten','/ueber-uns':'ueber','/kontakt':'kontakt'};
+  var pages=document.querySelectorAll('.page'), links=document.querySelectorAll('#links a');
+  var linksBox=document.getElementById('links'), burger=document.getElementById('burger');
+  var curtain=document.getElementById('curtain'), curtainLabel=document.getElementById('curtain-label');
+  var nav=document.getElementById('nav');
+  var current=null, io=null;
+
+  /* ===== Raster: colour weather drifting through a tile grid ===== */
+  var R={c:null,x:null,w:0,h:0,cols:0,rows:0,t:0,raf:null,mx:-9e3,my:-9e3,wake:[]};
+  var TILE=18, GAP=3;
+  var COLS={navy:[27,50,96],teal:[46,124,134],ochre:[217,164,65],brick:[181,70,44],paper:[232,232,228]};
+  function noise(x,y,t){
+    return (Math.sin(x*0.35+t*0.60)+Math.cos(y*0.42-t*0.45)
+           +Math.sin((x+y)*0.21+t*0.80)+Math.cos((x-y)*0.27-t*0.35)
+           +0.6*Math.sin(x*0.9-y*0.6+t*1.3))/4.6;   /* ~ -1..1 */
+  }
+  function band(n,c,wd){ var d=Math.abs(n-c)/wd; return d>1?0:(1-d)*(1-d); }
+  function rgba(c,a){return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';}
+  function rasterSetup(canvas){
+    R.c=canvas; R.x=canvas.getContext('2d');
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    R.w=canvas.clientWidth; R.h=canvas.clientHeight;
+    canvas.width=R.w*dpr; canvas.height=R.h*dpr; R.x.setTransform(dpr,0,0,dpr,0,0);
+    R.cols=Math.ceil(R.w/(TILE+GAP))+1; R.rows=Math.ceil(R.h/(TILE+GAP))+1;
+  }
+  function rasterFrame(){
+    var x=R.x,t=R.t;
+    x.fillStyle='#14264A'; x.fillRect(0,0,R.w,R.h);
+    for(var j=0;j<R.rows;j++){for(var i=0;i<R.cols;i++){
+      var px=i*(TILE+GAP), py=j*(TILE+GAP);
+      var n=noise(i,j,t);
+      /* mouse wake: raises n locally so warm colours bloom under the cursor */
+      var dx=(px+TILE/2)-R.mx, dy=(py+TILE/2)-R.my, d2=dx*dx+dy*dy;
+      if(d2<160*160){ n+= (1-Math.sqrt(d2)/160)*0.9; }
+      /* base tile: slightly lighter navy so the grid reads */
+      x.fillStyle=rgba(COLS.navy,0.55+0.25*n); x.fillRect(px,py,TILE,TILE);
+      var a;
+      if((a=band(n,-0.05,0.34))>0.02){x.fillStyle=rgba(COLS.teal,a*0.85);x.fillRect(px,py,TILE,TILE);}
+      if((a=band(n,0.42,0.26))>0.02){x.fillStyle=rgba(COLS.ochre,a*0.9);x.fillRect(px,py,TILE,TILE);}
+      if((a=band(n,0.78,0.22))>0.02){x.fillStyle=rgba(COLS.brick,a);x.fillRect(px,py,TILE,TILE);}
+      if(n>0.98){x.fillStyle=rgba(COLS.paper,Math.min(1,(n-0.98)*6));x.fillRect(px,py,TILE,TILE);}
+    }}
+  }
+  function rasterLoop(){ R.t+=0.012; rasterFrame(); R.raf=requestAnimationFrame(rasterLoop); }
+  function rasterStart(canvas){
+    rasterStop(); rasterSetup(canvas);
+    if(reduce){R.t=3.1;rasterFrame();return;}
+    rasterLoop();
+  }
+  function rasterStop(){ if(R.raf){cancelAnimationFrame(R.raf);R.raf=null;} }
+  window.addEventListener('pointermove',function(e){
+    if(!R.c)return; var r=R.c.getBoundingClientRect();
+    R.mx=e.clientX-r.left; R.my=e.clientY-r.top;
+  },{passive:true});
+  window.addEventListener('pointerleave',function(){R.mx=R.my=-9e3;});
+  window.addEventListener('resize',function(){ if(R.c){rasterSetup(R.c); if(reduce)rasterFrame();} });
+  document.addEventListener('visibilitychange',function(){ if(!R.c||reduce)return; if(document.hidden)rasterStop(); else if(!R.raf)rasterLoop(); });
+
+  /* ===== headline word masks ===== */
+  document.querySelectorAll('[data-split]').forEach(function(h){
+    var words=h.textContent.trim().split(/\s+/); h.textContent='';
+    words.forEach(function(w,i){
+      var o=document.createElement('span'); o.className='w';
+      var s=document.createElement('span'); s.textContent=w; s.style.transitionDelay=(i*0.045)+'s';
+      o.appendChild(s); h.appendChild(o); if(i<words.length-1)h.appendChild(document.createTextNode(' '));
+    });
+  });
+
+  function count(el){
+    var to=parseInt(el.getAttribute('data-count'),10), t0=null, dur=1100;
+    if(reduce){el.textContent=to;return;}
+    function tick(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/dur); p=1-Math.pow(1-p,3);
+      el.textContent=Math.round(to*p); if(p<1)requestAnimationFrame(tick); }
+    requestAnimationFrame(tick);
+  }
+
+  function observe(page){
+    if(io)io.disconnect();
+    var els=page.querySelectorAll('.draw,.lift,[data-count]');
+    if(reduce){els.forEach(function(e){e.classList.add('in');if(e.hasAttribute('data-count'))count(e);});return;}
+    io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(!en.isIntersecting)return;
+        en.target.classList.add('in');
+        if(en.target.hasAttribute('data-count')&&!en.target.dataset.done){en.target.dataset.done=1;count(en.target);}
+        io.unobserve(en.target); });
+    },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+    els.forEach(function(e){io.observe(e);});
+  }
+
+  function activate(id){
+    var page=null;
+    for(var i=0;i<pages.length;i++){var on=pages[i].id==='page-'+id;pages[i].classList.toggle('on',on);if(on)page=pages[i];
+      pages[i].querySelectorAll('.in').forEach(function(e){e.classList.remove('in');});
+      pages[i].querySelectorAll('[data-count]').forEach(function(e){e.dataset.done='';e.textContent='0';});
+      var h=pages[i].querySelector('[data-split]'); if(h)h.classList.remove('in'); }
+    for(var j=0;j<links.length;j++)links[j].classList.toggle('on',links[j].getAttribute('data-page')===id);
+    linksBox.classList.remove('open'); burger.setAttribute('aria-expanded','false');
+    window.scrollTo(0,0);
+    document.title='IT conAIX – '+page.getAttribute('data-title');
+    rasterStart(page.querySelector('canvas.raster'));
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      var h=page.querySelector('[data-split]'); if(h)h.classList.add('in');
+      observe(page);
+    });});
+    current=id;
+  }
+
+  function route(){
+    var key=(location.hash||'#/').replace(/^#/,''); var id=routes[key]||'home';
+    if(id===current)return;
+    if(current===null||reduce){activate(id);return;}
+    var target=document.getElementById('page-'+id);
+    curtainLabel.textContent=target.getAttribute('data-title');
+    curtain.classList.remove('down'); curtain.classList.add('up');
+    setTimeout(function(){ activate(id);
+      curtain.classList.remove('up'); curtain.classList.add('down');
+    },520);
+  }
+
+  burger.addEventListener('click',function(){
+    var open=linksBox.classList.toggle('open'); burger.setAttribute('aria-expanded',open?'true':'false');
+  });
+  window.addEventListener('hashchange',route);
+  window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>24);},{passive:true});
+  route();
+})();
+</script>
