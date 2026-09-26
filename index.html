@@ -1,7 +1,23 @@
-<title>IT conAIX</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap">
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IT conAIX – IT-Betreuung, Websites und Software aus Aachen</title>
+<meta name="description" content="IT conAIX aus Aachen: IT-Betreuung für Unternehmen, Websites und Online-Shops, Software und Automatisierung. Persönlich, mit Festpreisen und Hosting in Deutschland.">
+<meta name="theme-color" content="#FAFAFB">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://facecem.github.io/itconaix/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="IT conAIX">
+<meta property="og:title" content="IT conAIX – IT, Websites und Software aus Aachen">
+<meta property="og:description" content="IT-Betreuung, Websites und Software für Unternehmen in Aachen und der Region. Persönlich, mit Festpreisen und Hosting in Deutschland.">
+<meta property="og:url" content="https://facecem.github.io/itconaix/">
+<link rel="preload" href="assets/fonts/urbanist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js"></script>
 <style>
   :root{
     --bg:#FAFAFB;
@@ -98,7 +114,9 @@
   .photo{border-radius:var(--r);min-height:360px;position:relative;overflow:hidden;
     background:radial-gradient(120% 90% at 20% 10%,rgba(46,124,134,.55),transparent 60%),radial-gradient(90% 80% at 90% 90%,rgba(217,164,65,.45),transparent 60%),var(--navy);
     box-shadow:0 30px 60px -30px rgba(20,38,74,.55)}
-  .photo .lbl{position:absolute;left:16px;bottom:16px;right:16px;background:rgba(255,255,255,.9);border-radius:14px;padding:10px 14px;font-size:13.5px;color:var(--ink-2);font-weight:600}
+  .photo .lbl{position:absolute;left:16px;bottom:16px;right:16px;background:rgba(255,255,255,.92);border-radius:14px;padding:12px 16px;font-size:14px;color:var(--ink-2);font-weight:600;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .photo .lbl b{color:var(--ink);font-size:16px}
+  .photo .aix{position:absolute;left:22px;top:6px;font-weight:800;font-size:clamp(6rem,14vw,10rem);letter-spacing:-.06em;line-height:1;color:rgba(255,255,255,.14)}
   .about p.big{font-size:clamp(1.5rem,2.8vw,2.3rem);line-height:1.22;letter-spacing:-.025em;font-weight:600}
   .hl{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;background:linear-gradient(90deg,var(--brick),var(--ochre));-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
   @media(max-width:860px){.about{grid-template-columns:1fr}}
@@ -270,11 +288,13 @@
   .contact a:hover{background:rgba(255,255,255,.1)}
   .contact small{display:block;color:#8D93A0;font-size:13px;font-weight:600;margin-bottom:6px}
   .contact b{font-size:1.2rem;letter-spacing:-.02em}
+  .end .todo{background:rgba(255,241,184,.18);color:#FFE7A0}
   .end .acts{display:flex;margin-top:40px;flex-direction:column;align-items:center;gap:10px}
   .end .acts small{color:#8D93A0;font-size:13.5px}
   .foot{margin-top:100px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
   .foot nav{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:14.5px;color:#AEB3BF}
-  .foot nav a:hover{color:#fff}
+  .foot nav a:hover,.foot .linkbtn:hover{color:#fff}
+  .foot .linkbtn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
   .foot .logo{font-size:30px;color:#fff}
   .foot .logo .ai{background:linear-gradient(90deg,#7FC3CB,#E8C98A);-webkit-background-clip:text;background-clip:text}
   .foot small{color:#6E7482;font-size:13px}
@@ -350,6 +370,9 @@
   .bk-done p{color:var(--ink-2);margin-top:10px;max-width:48ch}
   .bk-done .sum{margin-top:18px;padding:16px 18px;border-radius:16px;background:#FBFBFC;border:1px solid var(--line);font-weight:700;font-size:15px;line-height:1.6}
   .bk-embed{width:100%;height:640px;border:0;border-radius:16px;margin-top:20px}
+  .bk-consent{margin-top:8px;padding:26px;border-radius:18px;background:#FBFBFC;border:1px solid var(--line)}
+  .bk-consent p{color:var(--ink-2);max-width:52ch}
+  .bk-consent a{text-decoration:underline}
   @media(max-width:860px){
     .bk{padding:0;place-items:end center}
     .bk-pan{grid-template-columns:1fr;border-radius:24px 24px 0 0;max-height:94vh}
@@ -374,6 +397,8 @@
     html{scroll-behavior:auto}
   }
 </style>
+</head>
+<body>
 
 <header class="nav">
   <div class="nav-in">
@@ -384,8 +409,8 @@
       <a href="#name">Der Name</a>
       <a href="#preise">Investition</a>
       <a href="#ablauf">Ablauf</a>
-      <a href="#stimmen">Stimmen</a>
       <a href="#faq">FAQ</a>
+      <a href="#kontakt">Kontakt</a>
     </nav>
     <a class="btn btn-dark" href="#termin" data-book>Projekt besprechen
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
@@ -418,19 +443,10 @@
     </div>
   </section>
 
-  <!-- LOGO STRIP -->
-  <div class="strip">
-    <p>Ausgewählte Kunden (Platzhalter für echte Logos)</p>
-    <div class="marq"><div class="t">
-      <span>Kunde Eins</span><span>Logistik Nord</span><span>Praxisverbund</span><span>Kanzlei am Dom</span><span>Rösterei</span><span>Handwerk GmbH</span>
-      <span>Kunde Eins</span><span>Logistik Nord</span><span>Praxisverbund</span><span>Kanzlei am Dom</span><span>Rösterei</span><span>Handwerk GmbH</span>
-    </div></div>
-  </div>
-
   <!-- ABOUT -->
   <section>
     <div class="wrap about">
-      <div class="photo rv"><div class="lbl">Platzhalter: Foto vom Team, z. B. vor dem Aachener Dom</div></div>
+      <div class="photo rv" role="img" aria-label="Aachen, Standort von IT conAIX"><div class="aix" aria-hidden="true">AIX</div><div class="lbl"><b>Aachen</b><span>50°46′ N · 6°05′ E</span></div></div>
       <p class="big rv">Als Team aus Aachen betreuen wir die IT von Unternehmen in der Region und bauen Websites und Software, die dazu passen. Uns sind <span class="hl">Verlässlichkeit und ein direkter Draht</span> wichtig, damit eure Technik einfach funktioniert und euch nach vorne bringt.</p>
     </div>
   </section>
@@ -491,34 +507,25 @@
   <section id="arbeiten" style="padding-top:40px">
     <div class="wrap">
       <div class="head rv">
-        <h2>Ideen, die<br><span class="serif">laufen</span></h2>
-        <p>Beispielprojekte als Platzhalter. Hier kommen eure echten Referenzen hin.</p>
+        <h2>Was wir<br><span class="serif">typischerweise bauen</span></h2>
+        <p>So sehen Projekte bei uns aus. Referenzen mit Kundennamen zeigen wir euch gern im Gespräch.</p>
       </div>
       <div class="work">
-        <div class="proj rv" data-c="#14264A,#2E7C86" data-l="Screenshot Kundenportal"><h3>Logistik Nord</h3><div><div class="cat">Kundenportal &amp; Automatisierung</div><p class="txt">Sendungen verfolgen, Rechnungen abrufen und Aufträge anlegen, ohne Anruf im Büro. Angebunden an die bestehende Speditionssoftware.</p></div></div>
-        <div class="proj rv" data-c="#B5462C,#D9A441" data-l="Foto Netzwerkschrank"><h3>Praxisverbund</h3><div><div class="cat">IT-Betreuung</div><p class="txt">Drei Standorte zusammengeführt, neues Netzwerk, zentrale Datensicherung. Seitdem in laufender Betreuung.</p></div></div>
-        <div class="proj rv" data-c="#2E7C86,#D9A441" data-l="Screenshot Website"><h3>Kanzlei am Dom</h3><div><div class="cat">Website</div><p class="txt">Relaunch mit klarer Struktur nach Rechtsgebieten und Online-Terminanfrage. Pflege durch das Sekretariat selbst.</p></div></div>
-        <div class="proj rv" data-c="#D9A441,#B5462C" data-l="Screenshot Shop"><h3>Rösterei</h3><div><div class="cat">Online-Shop</div><p class="txt">Shop mit Abo-Funktion und Anbindung an die Buchhaltung. Sortiment und Preise pflegt die Inhaberin selbst.</p></div></div>
-        <div class="proj rv" data-c="#14264A,#B5462C" data-l="Screenshot App"><h3>Handwerk GmbH</h3><div><div class="cat">Web-App</div><p class="txt">Zeiterfassung auf der Baustelle per Handy, Auswertung im Büro, Export in die Lohnbuchhaltung.</p></div></div>
+        <div class="proj rv" data-c="#14264A,#2E7C86" data-l="Portal: Aufträge, Rechnungen, Status"><h3>Kundenportale</h3><div><div class="cat">Kundenportal &amp; Automatisierung</div><p class="txt">Eure Kunden verfolgen Aufträge, laden Rechnungen und stellen Anfragen selbst, ohne Anruf im Büro. Angebunden an eure bestehende Software.</p></div></div>
+        <div class="proj rv" data-c="#B5462C,#D9A441" data-l="Netzwerk, Backup, Betreuung"><h3>IT für Praxen</h3><div><div class="cat">IT-Betreuung</div><p class="txt">Mehrere Standorte zusammenführen, Netzwerk neu aufbauen, zentrale Datensicherung einrichten und danach laufend betreuen.</p></div></div>
+        <div class="proj rv" data-c="#2E7C86,#D9A441" data-l="Website mit Redaktionssystem"><h3>Firmen-Websites</h3><div><div class="cat">Website</div><p class="txt">Klare Struktur, Online-Anfragen und ein Redaktionssystem, mit dem ihr Texte und Bilder selbst pflegt.</p></div></div>
+        <div class="proj rv" data-c="#D9A441,#B5462C" data-l="Shop mit Abo und Buchhaltung"><h3>Online-Shops</h3><div><div class="cat">Online-Shop</div><p class="txt">Shops mit Abo-Funktion und Anbindung an eure Buchhaltung. Sortiment und Preise pflegt ihr selbst.</p></div></div>
+        <div class="proj rv" data-c="#14264A,#B5462C" data-l="Web-App für unterwegs"><h3>Tools fürs Handwerk</h3><div><div class="cat">Web-App</div><p class="txt">Zeiterfassung auf der Baustelle per Handy, Auswertung im Büro, Export in die Lohnbuchhaltung. Schluss mit Zetteln und Excel.</p></div></div>
       </div>
     </div>
   </section>
   <div class="preview" id="preview" aria-hidden="true"></div>
-
-  <!-- QUOTE -->
-  <section class="quote">
-    <div class="wrap rv">
-      <blockquote>„Früher haben wir bei jedem Ausfall drei Firmen angerufen. Heute rufen wir <span class="pill">eine Nummer</span> an, und da geht jemand ran, der unser System <span class="serif">wirklich kennt</span>.“</blockquote>
-      <p class="ph-note">Platzhalter-Zitat. Echtes Kundenzitat mit Name und Firma einsetzen.</p>
-    </div>
-  </section>
 
   <!-- VALUES -->
   <section style="padding-top:20px">
     <div class="wrap">
       <div class="darkbox rv">
         <h2>Was anderswo extra kostet, <span class="serif">ist bei uns Standard.</span></h2>
-        <div class="founders"><i aria-hidden="true"></i><div><b style="color:#fff">Platzhalter: Namen der Gründer</b><br>Die Gründer von IT conAIX</div></div>
         <div class="vals">
           <div class="val"><div class="dot" style="background:var(--teal)"></div><h3>Direkter Draht statt Hotline</h3><p>Ihr sprecht mit den Leuten, die eure Systeme selbst betreuen. Keine Ticketnummer, keine Warteschleife.</p></div>
           <div class="val"><div class="dot" style="background:var(--ochre)"></div><h3>Transparente Festpreise</h3><p>Ihr kennt die Kosten, bevor wir anfangen. Nicht erst, wenn die Rechnung kommt.</p></div>
@@ -547,7 +554,7 @@
           <p>IT-Betreuung ab 39 € pro Arbeitsplatz und Monat. Software nach Festpreis-Angebot.</p>
           <a class="btn btn-dark" href="#termin" data-book>Projekt besprechen
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-          <small>30 Minuten, kostenlos. Preise sind Platzhalter.</small>
+          <small>Erstgespräch: 30 Minuten, kostenlos. Alle Preise zzgl. MwSt.</small>
         </div>
       </div>
     </div>
@@ -567,22 +574,6 @@
         <div class="step rv"><div class="n" style="background:var(--brick-t);color:var(--brick)">04</div><h3>Start &amp; Betreuung</h3><p>Wir testen, gehen live und weisen euch ein. Danach bleiben wir auf Wunsch euer fester Partner für Betrieb und Weiterentwicklung.</p></div>
       </div>
     </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section id="stimmen" style="padding-bottom:60px">
-    <div class="wrap">
-      <div class="head rv">
-        <h2>Was unsere<br><span class="serif">Kunden sagen</span></h2>
-        <p>Platzhalter-Bewertungen. Hier kommen eure echten Google-Rezensionen hin.</p>
-      </div>
-    </div>
-    <div class="revs"><div class="t" id="revs">
-      <div class="rev"><p>Seit der Umstellung läuft unsere Technik einfach. Wenn doch mal etwas ist, ist in kurzer Zeit jemand da, der Bescheid weiß.</p><div class="who"><i>AB</i><div>Kundenname<div class="ph">Platzhalter</div></div></div></div>
-      <div class="rev"><p>Die neue Website bringt uns endlich Anfragen. Texte und Bilder können wir selbst ändern, ohne jedes Mal anzurufen.</p><div class="who"><i>CD</i><div>Kundenname<div class="ph">Platzhalter</div></div></div></div>
-      <div class="rev"><p>Klare Absprachen, fester Preis, und das Ergebnis war pünktlich fertig. Genau so haben wir uns das vorgestellt.</p><div class="who"><i>EF</i><div>Kundenname<div class="ph">Platzhalter</div></div></div></div>
-      <div class="rev"><p>Die Automatisierung spart uns jede Woche mehrere Stunden Büroarbeit. Hätten wir viel früher machen sollen.</p><div class="who"><i>GH</i><div>Kundenname<div class="ph">Platzhalter</div></div></div></div>
-    </div></div>
   </section>
 
   <!-- FAQ -->
@@ -609,18 +600,18 @@
     <h2 class="rv">Lasst uns eure<br>IT <span class="serif">verbinden</span></h2>
     <p class="lead rv">Erzählt uns, was euch gerade beschäftigt. Wir melden uns am selben Werktag.</p>
     <div class="contact rv">
-      <a href="mailto:hallo@itconaix.de"><small>E-Mail</small><b>hallo@itconaix.de</b></a>
-      <a href="tel:+49241000000"><small>Telefon</small><b>0241 000 000</b></a>
-      <div><small>Adresse</small><b>Musterstraße 12, 52062 Aachen</b></div>
+      <a data-cfg-mail href="mailto:hallo@itconaix.de"><small>E-Mail</small><b data-cfg="email">hallo@itconaix.de</b></a>
+      <a data-cfg-tel><small>Telefon</small><b data-cfg="telefon"></b></a>
+      <div><small>Adresse</small><b><span data-cfg="strasse"></span>, <span data-cfg="plzOrt"></span></b></div>
     </div>
     <div class="acts rv">
       <a class="btn btn-light" href="#termin" data-book>Projekt besprechen
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-      <small>30 Minuten, unverbindlich. Kontaktdaten sind Platzhalter.</small>
+      <small>30 Minuten, unverbindlich und kostenlos.</small>
     </div>
     <div class="foot">
       <a class="logo" href="#top">IT&nbsp;con<span class="ai">AI</span>X</a>
-      <nav aria-label="Fußzeile"><a href="#leistungen">Leistungen</a><a href="#arbeiten">Arbeiten</a><a href="#name">Der Name</a><a href="#preise">Investition</a><a href="#ablauf">Ablauf</a><a href="#faq">FAQ</a><a href="#kontakt">Impressum</a><a href="#kontakt">Datenschutz</a></nav>
+      <nav aria-label="Fußzeile"><a href="#leistungen">Leistungen</a><a href="#arbeiten">Arbeiten</a><a href="#name">Der Name</a><a href="#preise">Investition</a><a href="#ablauf">Ablauf</a><a href="#faq">FAQ</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><button type="button" class="linkbtn" data-cookie-settings>Cookie-Einstellungen</button></nav>
       <small>© 2026 IT conAIX, Aachen</small>
     </div>
   </div>
@@ -691,7 +682,7 @@
           <button type="button" class="bk-back" data-go="pick">Zurück</button>
           <button type="submit" class="btn btn-dark">Termin anfragen</button>
         </div>
-        <p class="bk-note">Wir nutzen eure Angaben nur, um den Termin mit euch abzustimmen. Mehr dazu im Datenschutz.</p>
+        <p class="bk-note">Wir nutzen eure Angaben nur, um den Termin mit euch abzustimmen. Mehr dazu in der <a href="datenschutz.html" style="text-decoration:underline">Datenschutzerklärung</a>.</p>
       </form>
 
       <!-- Termin: step 3, done -->
@@ -713,7 +704,7 @@
           <div class="full err" id="mm-err" role="alert"></div>
         </div>
         <div class="bk-row"><button type="submit" class="btn btn-dark">Nachricht senden</button></div>
-        <p class="bk-note">Oder direkt: <a href="mailto:hallo@itconaix.de" style="text-decoration:underline">hallo@itconaix.de</a> · <a href="tel:+49241000000" style="text-decoration:underline">0241 000 000</a></p>
+        <p class="bk-note">Oder direkt: <a data-cfg-mail href="mailto:hallo@itconaix.de" style="text-decoration:underline"><span data-cfg="email">hallo@itconaix.de</span></a> · <a data-cfg-tel style="text-decoration:underline"><span data-cfg="telefon"></span></a></p>
       </form>
 
       <!-- Optional: external booking tool (Calendly / Cal.com) -->
@@ -764,7 +755,7 @@
   document.querySelectorAll('.proj').forEach(function(p){
     p.addEventListener('mouseenter',function(){var c=p.dataset.c.split(',');
       pv.style.background='repeating-linear-gradient(135deg,transparent 0 12px,rgba(255,255,255,.08) 12px 13px),linear-gradient(135deg,'+c[0]+','+c[1]+')';
-      pv.textContent='Platzhalter: '+p.dataset.l;pv.classList.add('on');});
+      pv.textContent=p.dataset.l;pv.classList.add('on');});
     p.addEventListener('mouseleave',function(){pv.classList.remove('on');});
   });
   addEventListener('pointermove',function(e){pv.style.left=e.clientX+'px';pv.style.top=e.clientY+'px';},{passive:true});
@@ -773,8 +764,9 @@
      BOOKING_URL leer lassen  -> eigener Kalender, Anfrage geht per E-Mail raus.
      BOOKING_URL setzen, z. B. 'https://calendly.com/itconaix/30min' oder 'https://cal.com/itconaix/30min'
                               -> echtes Buchungstool wird im Fenster eingebettet, Termine landen direkt im Kalender. */
-  var BOOKING_URL='';
-  var MAIL='hallo@itconaix.de';
+  var CFG=(window.ITC&&ITC.config)||{};
+  var BOOKING_URL=CFG.bookingUrl||'';
+  var MAIL=CFG.email||'hallo@itconaix.de';
   var SLOT_FROM=9, SLOT_TO=17, SLOT_MIN=30, LEAD_HOURS=18, DAYS_AHEAD=42;
 
   var bk=document.getElementById('bk'),lastFocus=null;
@@ -887,11 +879,27 @@
     else show(BOOKING_URL?'embed':(S.time?'form':'pick'));
   });});
 
+  function renderEmbed(){
+    var em=bk.querySelector('[data-step="embed"]'),name=CFG.bookingAnbieter||'Buchungstool';
+    if(ITC.consent.get().extern){
+      if(!em.querySelector('iframe'))em.innerHTML='<iframe class="bk-embed" title="Termin buchen" src="'+BOOKING_URL+'"></iframe>';
+    }else{
+      em.innerHTML='<div class="bk-consent"><div class="bk-h">Terminkalender laden</div>'+
+        '<p>Für die Buchung binden wir '+name+' ein. Dabei werden Daten, zum Beispiel eure IP-Adresse, an den Anbieter übertragen, auch in die USA. <a href="datenschutz.html#terminbuchung">Mehr dazu</a></p>'+
+        '<div class="bk-row"><button type="button" class="btn btn-dark" data-load-cal>Kalender laden</button>'+
+        '<button type="button" class="bk-back" data-tab-msg>Lieber eine Nachricht schreiben</button></div></div>';
+    }
+  }
+  bk.addEventListener('click',function(e){
+    if(e.target.closest('[data-load-cal]')){ITC.consent.set(true);renderEmbed();}
+    if(e.target.closest('[data-tab-msg]'))bk.querySelector('[data-tab="nachricht"]').click();
+  });
+  if(window.ITC)ITC.consent.on(function(){ if(BOOKING_URL&&!bk.hidden)renderEmbed(); });
+
   function openBooking(){
     lastFocus=document.activeElement;
     if(BOOKING_URL){
-      var em=bk.querySelector('[data-step="embed"]');
-      if(!em.firstChild)em.innerHTML='<iframe class="bk-embed" title="Termin buchen" src="'+BOOKING_URL+'"></iframe><p class="bk-note">Die Terminbuchung lädt einen externen Kalenderdienst und überträgt dabei Verbindungsdaten. Mehr dazu im Datenschutz.</p>';
+      renderEmbed();
       show('embed');
     }else{
       if(!S.view){var fb=firstBookable();S.view=new Date(fb.getFullYear(),fb.getMonth(),1);}
@@ -923,8 +931,6 @@
   });
   if(location.hash==='#termin')openBooking();
 
-  /* duplicate reviews for seamless marquee */
-  var rv=document.getElementById('revs');rv.innerHTML+=rv.innerHTML;
 
   /* reveal (content visible at rest; only translate) */
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.1});
@@ -960,13 +966,13 @@
         x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,a.y);x.lineTo(b.x,b.y);x.stroke();});
       pulses.forEach(function(p){var a=nodes[p.a],b=nodes[p.b];p.t+=p.s;
         for(var k=0;k<14;k++){var tt=p.t-k*.012;if(tt<0||tt>1)continue;var q=pt(a,b,tt);
-          x.globalAlpha=(1-k/14)*.9;x.fillStyle=p.c;x.fillRect(q.x-2.5,q.y-2.5,5,5);}
+          x.globalAlpha=(1-k/14)*.9*(opt.alpha||1);x.fillStyle=p.c;x.fillRect(q.x-2.5,q.y-2.5,5,5);}
         x.globalAlpha=1;});
       pulses=pulses.filter(function(p){return p.t<1.2;});
       nodes.forEach(function(n){var d=Math.hypot(n.x-mx,n.y-my),near=d<150?1-d/150:0;
         var r=3.5+Math.sin(tm/700+n.p)*.8+near*4;
         x.fillStyle=opt.bg;x.fillRect(n.x-r-2,n.y-r-2,(r+2)*2,(r+2)*2);
-        x.globalAlpha=.55+near*.45;x.fillStyle=n.c;x.fillRect(n.x-r,n.y-r,r*2,r*2);x.globalAlpha=1;});
+        x.globalAlpha=(.55+near*.45)*(opt.alpha||1);x.fillStyle=n.c;x.fillRect(n.x-r,n.y-r,r*2,r*2);x.globalAlpha=1;});
       if(Math.random()<opt.rate)spawn();
     }
     function loop(tm){draw(tm);raf=requestAnimationFrame(loop);}
@@ -979,8 +985,11 @@
         for(var i=0;i<links.length;i++){var a=nodes[links[i][0]];if(Math.hypot(a.x-mx,a.y-my)<120){spawn(i,'#2E7C86',.02);break;}}}
     },{passive:true});
   }
-  net(document.getElementById('heroNet'),{density:.09,rate:.12,line:'rgba(20,38,74,.10)',bg:'#FAFAFB',
+  var narrow=innerWidth<900;
+  net(document.getElementById('heroNet'),{density:narrow?.05:.09,rate:.12,alpha:narrow?.35:1,line:narrow?'rgba(20,38,74,.05)':'rgba(20,38,74,.10)',bg:'#FAFAFB',
     avoid:function(px,py,w,h){return w>900&&px<Math.min(w*.62,780)&&py>h*.14&&py<h*.9;}});
   net(document.getElementById('endNet'),{density:.06,rate:.1,line:'rgba(255,255,255,.07)',bg:'#0C0E13'});
 })();
 </script>
+</body>
+</html>
