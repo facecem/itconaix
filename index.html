@@ -110,36 +110,27 @@
   @keyframes m{to{transform:translateX(-50%)}}
 
   /* ---------- About ---------- */
-  .about{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:center}
-  .photo{border-radius:var(--r);min-height:360px;position:relative;overflow:hidden;
-    background:radial-gradient(120% 90% at 20% 10%,rgba(46,124,134,.55),transparent 60%),radial-gradient(90% 80% at 90% 90%,rgba(217,164,65,.45),transparent 60%),var(--navy);
-    box-shadow:0 30px 60px -30px rgba(20,38,74,.55)}
-  .photo{min-height:490px}
-  .status{position:absolute;left:22px;top:22px;width:min(350px,calc(100% - 44px));background:#fff;border-radius:18px;padding:16px 18px 8px;
-    box-shadow:0 24px 50px -24px rgba(0,0,0,.55)}
-  .st-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
-  .st-h b{font-size:15px;letter-spacing:-.01em}
-  .st-h span{font-size:11.5px;font-weight:700;color:var(--muted);background:#F1F2F5;border-radius:6px;padding:2px 8px}
-  .st-r{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px;color:var(--ink-2)}
-  .st-r b{color:var(--ink);font-weight:700}
-  .st-r small{margin-left:auto;font-size:12.5px;color:var(--muted);white-space:nowrap}
-  .ok{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;flex:none;background:var(--teal-t);color:var(--teal);
-    opacity:0;transform:scale(.5);transition:opacity .4s,transform .5s var(--ease)}
-  .ok svg{width:12px;height:12px}
-  .photo.in .ok{opacity:1;transform:none}
-  .st-r:nth-child(3) .ok{transition-delay:.25s}.st-r:nth-child(4) .ok{transition-delay:.5s}
-  .st-r:nth-child(5) .ok{transition-delay:.75s}.st-r:nth-child(6) .ok{transition-delay:1s}
-  .st-r .cal{background:var(--ochre-t);color:#A9771C}
-  .livedot{width:7px;height:7px;border-radius:50%;background:#2E9D6A;display:inline-block;margin-right:6px;animation:breath 2.2s ease-in-out infinite}
-  @keyframes breath{50%{opacity:.25}}
-  .live{position:absolute;right:18px;bottom:18px;width:min(210px,56%);background:#fff;border-radius:14px;padding:7px 7px 9px;
-    box-shadow:0 24px 50px -20px rgba(0,0,0,.6);transform:rotate(2.5deg);transition:transform .5s var(--ease)}
-  .live:hover{transform:rotate(0) translateY(-3px)}
-  .live img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-radius:8px}
-  .live span{display:block;font-size:12.5px;color:var(--ink-2);padding:7px 4px 0}
-  .live span b{color:var(--ink)}
-  @media(max-width:520px){.photo{min-height:520px}.live{width:62%}}
-  .about p.big{font-size:clamp(1.5rem,2.8vw,2.3rem);line-height:1.22;letter-spacing:-.025em;font-weight:600}
+  .about{display:grid;grid-template-columns:7fr 5fr;gap:56px;align-items:center}
+  /* Vorher/Nachher-Regler */
+  .ba-wrap{margin:0}
+  .ba{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:16/10;background:#fff;border:1px solid var(--line);
+    box-shadow:0 30px 60px -30px rgba(20,38,74,.45);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+  .ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;display:block;pointer-events:none}
+  .ba-before{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+  .ba-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 0 1px rgba(14,17,22,.18);pointer-events:none}
+  .ba-knob{position:absolute;top:50%;left:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:#fff;display:grid;place-items:center;
+    box-shadow:0 10px 24px -8px rgba(0,0,0,.5);color:var(--ink);transition:transform .25s var(--ease)}
+  .ba:hover .ba-knob{transform:scale(1.08)}
+  .ba:has(input:focus-visible) .ba-knob{outline:3px solid var(--teal);outline-offset:3px}
+  .ba input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;-webkit-appearance:none;appearance:none}
+  .ba-tag{position:absolute;top:14px;font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:8px;pointer-events:none;color:#fff}
+  .ba-tag.l{left:14px;background:rgba(14,17,22,.72)}
+  .ba-tag.r{right:14px;background:var(--brick)}
+  .ba-wrap figcaption{margin-top:16px;font-size:15.5px;color:var(--ink-2);line-height:1.5}
+  .ba-wrap figcaption b{color:var(--ink)}
+  .ba-wrap figcaption a{font-weight:700;color:var(--ink);white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+  .ba-wrap figcaption small{display:block;margin-top:4px;font-size:13px;color:var(--muted)}
+  .about p.big{font-size:clamp(1.35rem,2.2vw,1.95rem);line-height:1.22;letter-spacing:-.025em;font-weight:600}
   .hl{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;background:linear-gradient(90deg,var(--brick),var(--ochre));-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
   @media(max-width:860px){.about{grid-template-columns:1fr}}
 
@@ -226,16 +217,18 @@
 
   /* ---------- Work list ---------- */
   .work{border-top:1px solid var(--line)}
-  .proj{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:34px 0;border-bottom:1px solid var(--line);align-items:center;cursor:pointer}
+  .proj{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:34px 0;border-bottom:1px solid var(--line);align-items:center;position:relative;isolation:isolate}
+  .proj::before{content:"";position:absolute;inset:6px -18px;border-radius:18px;background:var(--navy-t);z-index:-1;
+    opacity:0;transform:scaleY(.8);transition:opacity .35s,transform .45s var(--ease)}
+  .proj:nth-child(2)::before{background:var(--brick-t)}
+  .proj:nth-child(3)::before{background:var(--teal-t)}
+  .proj:nth-child(4)::before{background:var(--ochre-t)}
+  .proj:hover::before{opacity:1;transform:none}
   .proj h3{font-size:clamp(1.9rem,4vw,3rem);letter-spacing:-.045em;transition:transform .45s var(--ease),color .3s}
   .proj:hover h3{transform:translateX(12px);color:var(--navy)}
   .proj .cat{font-weight:800;font-size:14.5px}
   .proj .txt{color:var(--ink-2);font-size:16px;margin-top:6px;max-width:44ch}
-  .preview{position:fixed;left:0;top:0;width:300px;height:190px;border-radius:18px;pointer-events:none;z-index:40;
-    opacity:0;transform:translate(-50%,-50%) scale(.85) rotate(-3deg);transition:opacity .25s,transform .35s var(--ease);
-    box-shadow:0 30px 60px -20px rgba(14,17,22,.5);display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;text-align:center;padding:16px}
-  .preview.on{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-3deg)}
-  @media(max-width:760px){.proj{grid-template-columns:1fr;gap:10px}.preview{display:none}}
+  @media(max-width:760px){.proj{grid-template-columns:1fr;gap:10px}}
 
   /* ---------- Quote ---------- */
   .quote{text-align:center}
@@ -460,10 +453,9 @@
     .rot span,.rot span.on,.rot span.out{transform:none!important;transition:opacity 1s ease}
     .btn:hover,.card:hover,.val:hover,.step:hover,.key:hover,.key:focus,.proj:hover h3,.btn:hover svg,.word b,.ref:hover .shot img,.ref:hover .go svg{transform:none!important}
     .word b{transition:color .5s,opacity .5s}
-    .ok{transform:none!important}
-    .live,.live:hover{transform:none!important}
+    .ba:hover .ba-knob{transform:none}
     .bk-pan{animation:fade .3s}
-    .preview,.preview.on{transform:translate(-50%,-50%) rotate(-3deg);transition:opacity .3s}
+    .proj::before{transform:none!important}
   }
 </style>
 </head>
@@ -520,20 +512,21 @@
   <!-- ABOUT -->
   <section>
     <div class="wrap about">
-      <div class="photo rv">
-        <div class="status" role="img" aria-label="Beispiel eines Wochenberichts: Datensicherung jede Nacht, alle Geräte aktuell, Virenschutz aktiv, Website online, nächster Termin vor Ort am Donnerstag">
-          <div class="st-h" aria-hidden="true"><b>Eure IT diese Woche</b><span>Beispiel</span></div>
-          <div class="st-r" aria-hidden="true"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Datensicherung</b><small>jede Nacht, 03:00</small></div>
-          <div class="st-r" aria-hidden="true"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Updates</b><small>alle Geräte aktuell</small></div>
-          <div class="st-r" aria-hidden="true"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Virenschutz</b><small>aktiv</small></div>
-          <div class="st-r" aria-hidden="true"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Website</b><small><span class="livedot"></span>online</small></div>
-          <div class="st-r" aria-hidden="true"><span class="ok cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span><b>Vor Ort bei euch</b><small>Do, 10:00 Uhr</small></div>
+      <figure class="ba-wrap rv">
+        <div class="ba" id="ba" style="--pos:50%">
+          <img src="assets/refs/roobau.webp" width="1440" height="900" decoding="async" loading="lazy"
+            alt="roobau.de heute: neue Website von Roosenboom Baumanagement mit dunklem Hero und dem Slogan Wir bauen Zukunft">
+          <div class="ba-before"><img src="assets/refs/roobau-2025.webp" width="1440" height="900" decoding="async" loading="lazy"
+            alt="roobau.de im Februar 2025: graue Coming-Soon-Platzhalterseite"></div>
+          <span class="ba-tag l">Vorher · Feb. 2025</span>
+          <span class="ba-tag r">Nachher · heute</span>
+          <div class="ba-handle" aria-hidden="true"><span class="ba-knob"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 7-5 5 5 5M15 7l5 5-5 5"/></svg></span></div>
+          <input type="range" min="0" max="100" value="50" step="1" aria-label="Vorher und nachher vergleichen: Regler nach links oder rechts schieben">
         </div>
-        <a class="live" href="https://as-versorgung.de" target="_blank" rel="noopener">
-          <img src="assets/refs/as-versorgung.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Vorschau der Website as-versorgung.de">
-          <span><b>Neu live:</b> as-versorgung.de</span>
-        </a>
-      </div>
+        <figcaption><b>roobau.de</b> vorher und nachher: Aus einer Platzhalterseite wurde der komplette Auftritt von Roosenboom Baumanagement.
+          <a href="https://roobau.de" target="_blank" rel="noopener">Live ansehen <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          <small>Vorher-Stand laut Internet-Archiv (web.archive.org), Februar 2025.</small></figcaption>
+      </figure>
       <p class="big rv">Als Team aus Aachen betreuen wir die IT von Unternehmen in der Region und bauen Websites und Software, die dazu passen. Uns sind <span class="hl">Verlässlichkeit und ein direkter Draht</span> wichtig, damit eure Technik einfach funktioniert und euch nach vorne bringt.</p>
     </div>
   </section>
@@ -627,15 +620,14 @@
       </div>
       <h3 class="more-h rv">Außerdem bauen wir</h3>
       <div class="work">
-        <div class="proj rv" data-c="#14264A,#2E7C86" data-l="Portal: Aufträge, Rechnungen, Status"><h3>Kundenportale</h3><div><div class="cat">Kundenportal &amp; Automatisierung</div><p class="txt">Eure Kunden verfolgen Aufträge, laden Rechnungen und stellen Anfragen selbst, ohne Anruf im Büro. Angebunden an eure bestehende Software.</p></div></div>
-        <div class="proj rv" data-c="#B5462C,#D9A441" data-l="Netzwerk, Backup, Betreuung"><h3>IT für Praxen</h3><div><div class="cat">IT-Betreuung</div><p class="txt">Mehrere Standorte zusammenführen, Netzwerk neu aufbauen, zentrale Datensicherung einrichten und danach laufend betreuen.</p></div></div>
-        <div class="proj rv" data-c="#2E7C86,#D9A441" data-l="Website mit Redaktionssystem"><h3>Firmen-Websites</h3><div><div class="cat">Website</div><p class="txt">Klare Struktur, Online-Anfragen und ein Redaktionssystem, mit dem ihr Texte und Bilder selbst pflegt.</p></div></div>
-        <div class="proj rv" data-c="#D9A441,#B5462C" data-l="Shop mit Abo und Buchhaltung"><h3>Online-Shops</h3><div><div class="cat">Online-Shop</div><p class="txt">Shops mit Abo-Funktion und Anbindung an eure Buchhaltung. Sortiment und Preise pflegt ihr selbst.</p></div></div>
-        <div class="proj rv" data-c="#14264A,#B5462C" data-l="Web-App für unterwegs"><h3>Tools fürs Handwerk</h3><div><div class="cat">Web-App</div><p class="txt">Zeiterfassung auf der Baustelle per Handy, Auswertung im Büro, Export in die Lohnbuchhaltung. Schluss mit Zetteln und Excel.</p></div></div>
+        <div class="proj rv"><h3>Kundenportale</h3><div><div class="cat">Kundenportal &amp; Automatisierung</div><p class="txt">Eure Kunden verfolgen Aufträge, laden Rechnungen und stellen Anfragen selbst, ohne Anruf im Büro. Angebunden an eure bestehende Software.</p></div></div>
+        <div class="proj rv"><h3>IT für Praxen</h3><div><div class="cat">IT-Betreuung</div><p class="txt">Mehrere Standorte zusammenführen, Netzwerk neu aufbauen, zentrale Datensicherung einrichten und danach laufend betreuen.</p></div></div>
+        <div class="proj rv"><h3>Firmen-Websites</h3><div><div class="cat">Website</div><p class="txt">Klare Struktur, Online-Anfragen und ein Redaktionssystem, mit dem ihr Texte und Bilder selbst pflegt.</p></div></div>
+        <div class="proj rv"><h3>Online-Shops</h3><div><div class="cat">Online-Shop</div><p class="txt">Shops mit Abo-Funktion und Anbindung an eure Buchhaltung. Sortiment und Preise pflegt ihr selbst.</p></div></div>
+        <div class="proj rv"><h3>Tools fürs Handwerk</h3><div><div class="cat">Web-App</div><p class="txt">Zeiterfassung auf der Baustelle per Handy, Auswertung im Büro, Export in die Lohnbuchhaltung. Schluss mit Zetteln und Excel.</p></div></div>
       </div>
     </div>
   </section>
-  <div class="preview" id="preview" aria-hidden="true"></div>
 
   <!-- VALUES -->
   <section style="padding-top:20px">
@@ -879,15 +871,29 @@
     });
   });
 
-  /* project hover preview */
-  var pv=document.getElementById('preview');
-  document.querySelectorAll('.proj').forEach(function(p){
-    p.addEventListener('mouseenter',function(){var c=p.dataset.c.split(',');
-      pv.style.background='repeating-linear-gradient(135deg,transparent 0 12px,rgba(255,255,255,.08) 12px 13px),linear-gradient(135deg,'+c[0]+','+c[1]+')';
-      pv.textContent=p.dataset.l;pv.classList.add('on');});
-    p.addEventListener('mouseleave',function(){pv.classList.remove('on');});
-  });
-  addEventListener('pointermove',function(e){pv.style.left=e.clientX+'px';pv.style.top=e.clientY+'px';},{passive:true});
+  /* Vorher/Nachher-Regler */
+  var ba=document.getElementById('ba');
+  if(ba){
+    var bi=ba.querySelector('input');
+    var setPos=function(v){ba.style.setProperty('--pos',v+'%');};
+    bi.addEventListener('input',function(){setPos(bi.value);});
+    /* einmaliger Hinweis beim ersten Hinsehen, dass man ziehen kann (nicht bei "weniger Bewegung" oder Pause) */
+    if(!reduce){
+      var ioBa=new IntersectionObserver(function(es){
+        if(!es[0].isIntersecting)return; ioBa.disconnect(); if(paused)return;
+        var t0=null,touched=false;
+        bi.addEventListener('pointerdown',function(){touched=true;},{once:true});
+        bi.addEventListener('keydown',function(){touched=true;},{once:true});
+        setTimeout(function(){requestAnimationFrame(function step(ts){
+          if(touched)return; if(!t0)t0=ts; var k=(ts-t0)/2200;
+          if(k>=1){setPos(50);bi.value=50;return;}
+          setPos((50+Math.sin(k*Math.PI*2)*22*(1-k*k)).toFixed(1)); requestAnimationFrame(step);
+        });},400);
+      },{threshold:.6});
+      ioBa.observe(ba);
+    }
+  }
+
 
   /* ================= Booking =================
      BOOKING_URL leer lassen  -> eigener Kalender, Anfrage geht per E-Mail raus.
