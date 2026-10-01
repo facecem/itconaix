@@ -29,7 +29,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 HERE = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(HERE, "leads.db")
 PORT = int(os.environ.get("LEADFINDER_PORT", "8765"))
-PAGESPEED_KEY = os.environ.get("PAGESPEED_API_KEY", "").strip()
 USER_AGENT = "itconaix-leadfinder/1.0 (+https://itconaix.de; hallo@itconaix.de)"
 BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
@@ -103,9 +102,10 @@ def init_db():
             website_gefunden TEXT,           -- per Domain-Suche vermutet
             lat REAL, lon REAL,
             score INTEGER,                   -- 0-100, hoch = braucht neue Seite
-            kategorie TEXT,                  -- keine | schwach | ok | unerreichbar
+            kategorie TEXT,                  -- keine | kein_impressum | veraltet | ok | ignoriert
             befunde TEXT,                    -- JSON-Liste
-            pagespeed INTEGER,
+            impressum_fehlt INTEGER DEFAULT 0,
+            veraltet INTEGER DEFAULT 0,
             geprueft_am TEXT,
             status TEXT NOT NULL DEFAULT 'neu',
             notiz TEXT DEFAULT '',
@@ -113,6 +113,13 @@ def init_db():
         );
         CREATE TABLE IF NOT EXISTS settings (k TEXT PRIMARY KEY, v TEXT);
         """)
+        # Ältere Datenbanken nachrüsten; Prüfungen nach altem Schema neu durchführen lassen
+        cols = {r["name"] for r in con.execute("PRAGMA table_info(leads)")}
+        for c in ("impressum_fehlt", "veraltet"):
+            if c not in cols:
+                con.execute(f"ALTER TABLE leads ADD COLUMN {c} INTEGER DEFAULT 0")
+        con.execute("""UPDATE leads SET kategorie=NULL, score=NULL, befunde=NULL, geprueft_am=NULL
+                       WHERE kategorie IN ('schwach', 'unerreichbar')""")
 
 
 def now():
@@ -270,104 +277,153 @@ def find_website(name, ort):
     return ""
 
 
-def pagespeed(url):
-    params = {"url": url, "strategy": "mobile", "category": "performance"}
-    if PAGESPEED_KEY:
-        params["key"] = PAGESPEED_KEY
-    try:
-        _, _, _, body = http_get("https://www.googleapis.com/pagespeedonline/v5/runPagespeed?"
-                                 + urllib.parse.urlencode(params), timeout=90)
-        d = json.loads(body)
-        lh = d["lighthouseResult"]
-        score = round(lh["categories"]["performance"]["score"] * 100)
-        lcp = lh["audits"].get("largest-contentful-paint", {}).get("numericValue")
-        return score, (lcp / 1000 if lcp else None)
-    except Exception:
-        return None, None
+# Einträge, die keine eigene Website sind
+KEINE_EIGENE_SEITE = re.compile(
+    r"(^|\.)(facebook\.com|fb\.com|instagram\.com|linkedin\.com|xing\.com|tiktok\.com|youtube\.com|"
+    r"linktr\.ee|wa\.me|gelbeseiten\.de|dasoertliche\.de|11880\.com|meinestadt\.de|yelp\.\w+|"
+    r"tripadvisor\.\w+|google\.\w+|goo\.gl|business\.site|g\.page)$")
+FEHLERSEITE = re.compile(r"404|nicht gefunden|not found|existiert nicht|page not found|fehlerseite|error")
+KETTE_AB = 3  # gleiche Domain bei so vielen Betrieben = Filialkette
 
 
-def analyse_site(url):
-    """Prüft eine Website und liefert (score, kategorie, befunde, pagespeed)."""
-    befunde = []  # (punkte, text)
-    if not re.match(r"^https?://", url, re.I):
-        url = "https://" + url
-    t0 = time.time()
-    final, body, cert_problem = None, b"", False
-    try:
-        final, status, headers, body = http_get(url, timeout=20, ua=BROWSER_UA)
-    except urllib.error.URLError as e:
-        if isinstance(getattr(e, "reason", None), ssl.SSLError):
-            cert_problem = True
-        try:  # Fallback auf http://
-            final, status, headers, body = http_get(re.sub(r"^https://", "http://", url),
-                                                    timeout=20, ua=BROWSER_UA)
+def fetch(url, timeout=20, max_bytes=2_000_000):
+    """Lädt eine Seite. Liefert dict(final, status, html, cert) oder None bei Fehlern/Fehlerseiten."""
+    cert = False
+    for u in (url, re.sub(r"^https://", "http://", url)):
+        try:
+            final, status, headers, body = http_get(u, timeout=timeout, ua=BROWSER_UA, max_bytes=max_bytes)
+        except urllib.error.HTTPError:
+            return None  # 4xx/5xx = Fehlerseite
+        except urllib.error.URLError as e:
+            if isinstance(getattr(e, "reason", None), ssl.SSLError):
+                cert = True
+                continue
+            if u.startswith("https://"):
+                continue
+            return None
         except Exception:
-            final = None
-    except Exception:
-        final = None
-    ladezeit = time.time() - t0
+            if u.startswith("https://"):
+                continue
+            return None
+        page = body.decode("utf-8", "ignore")
+        title = " ".join(t for _, t in re.findall(r"<(title|h1)[^>]*>(.*?)</\1>", page[:30000], re.I | re.S)).lower()
+        if FEHLERSEITE.search(title) and len(sichtbarer_text(page)) < 1500:
+            return None  # „Soft-404“: Fehlerseite mit Status 200
+        return {"final": final, "status": status, "html": page, "cert": cert}
+    return None
 
-    if final is None:
-        return 90, "unerreichbar", [[60, "Website ist nicht erreichbar – Kunden landen auf einer Fehlerseite"]], None
 
-    page = body.decode("utf-8", "ignore")
-    low = page.lower()
+def sichtbarer_text(page):
+    t = re.sub(r"(?is)<(script|style|noscript|svg)[^>]*>.*?</\1>", " ", page)
+    t = re.sub(r"(?s)<[^>]+>", " ", t)
+    return " ".join(html.unescape(t).split())
+
+
+def startseite(url):
+    p = urllib.parse.urlparse(url)
+    return f"{p.scheme}://{p.netloc}/"
+
+
+def host_of(url):
+    if not re.match(r"^https?://", url or "", re.I):
+        url = "https://" + (url or "")
+    h = (urllib.parse.urlparse(url).netloc or "").lower().split("@")[-1]
+    return h[4:] if h.startswith("www.") else h
+
+
+def hat_impressum(seite):
+    """True = gefunden, False = fehlt, None = nicht sicher prüfbar."""
+    low = seite["html"].lower()
+    if re.search(r"<a[^>]+href=[\"'][^\"']*(impressum|imprint|legal-notice|legal_notice)", low) or \
+            re.search(r"<a[^>]*>[^<]{0,40}(impressum|imprint)", low):
+        return True
+    root = startseite(seite["final"])
+    for pfad in ("impressum", "impressum/", "impressum.html", "impressum.htm", "impressum.php", "imprint", "kontakt-impressum"):
+        s = fetch(root + pfad, timeout=10, max_bytes=500_000)
+        if s and "impressum" in s["html"].lower() and s["final"].rstrip("/") != root.rstrip("/"):
+            return True
+    text = sichtbarer_text(seite["html"])
+    if len(text) < 300 and "<script" in low:
+        return None  # Inhalt wird per JavaScript nachgeladen – kein sicheres Urteil möglich
+    return False
+
+
+def design_befunde(seite):
+    """Merkmale eines veralteten Designs. Liefert (punkte, liste, starkes_merkmal)."""
+    page, low = seite["html"], seite["html"].lower()
     year = dt.date.today().year
+    out, stark = [], False
 
-    if cert_problem:
-        befunde.append([20, "SSL-Zertifikat ungültig – Browser zeigen eine Sicherheitswarnung"])
-    elif final.lower().startswith("http://"):
-        befunde.append([15, "Keine verschlüsselte Verbindung (kein HTTPS) – Browser zeigen „Nicht sicher“"])
+    def add(p, text, strong=False):
+        nonlocal stark
+        out.append([p, text])
+        stark = stark or strong
 
-    if 'name="viewport"' not in low and "name='viewport'" not in low and "name=viewport" not in low:
-        befunde.append([25, "Nicht für Smartphones optimiert – Text und Buttons sind auf dem Handy winzig"])
-
-    years = [int(y) for y in re.findall(r"(?:©|&copy;|copyright)\s*(?:\d{4}\s*[-–]\s*)?((?:19|20)\d{2})", low)]
-    if years:
-        newest = max(years)
-        if newest <= year - 4:
-            befunde.append([15, f"Copyright-Hinweis von {newest} – die Seite wirkt seit Jahren nicht gepflegt"])
-        elif newest <= year - 2:
-            befunde.append([5, f"Copyright-Hinweis von {newest} – nicht aktuell"])
-
-    if "impressum" not in low and "imprint" not in low:
-        befunde.append([10, "Kein Impressum gefunden – in Deutschland Pflicht und abmahnfähig"])
-
-    if re.search(r"<frameset|<font[\s>]|<marquee|\.swf[\"']|<center>", low):
-        befunde.append([15, "Veraltete Technik im Quelltext (z. B. Frames, Font-Tags, Flash)"])
-    elif low.count("<table") >= 6 and "<div" not in low:
-        befunde.append([10, "Tabellen-Layout aus den 2000ern"])
-
-    gen = re.search(r'<meta[^>]+name=["\']generator["\'][^>]+content=["\']([^"\']+)', low)
+    if not re.search(r"<meta[^>]+name=[\"']?viewport", low):
+        add(30, "Nicht für Smartphones gemacht – auf dem Handy winzig und schwer bedienbar", True)
+    head = low[:600]
+    if re.search(r"<!doctype html public \"-//w3c//dtd (html 4|xhtml 1\.0)", head):
+        add(15, "Technik-Stand der 2000er Jahre (alter HTML-Standard)", True)
+    elif "<!doctype" not in head:
+        add(10, "Kein moderner HTML-Standard")
+    if re.search(r"<frameset|<frame\s", low):
+        add(25, "Aufgebaut mit Frames – Technik aus den 90ern", True)
+    if re.search(r"\.swf[\"'?]|shockwave-flash", low):
+        add(25, "Nutzt Flash – wird von keinem Browser mehr angezeigt", True)
+    if re.search(r"<font[\s>]|<center>|<marquee|<blink", low):
+        add(15, "Veraltete Gestaltungs-Befehle (Font-/Center-Tags)", True)
+    if low.count("<table") >= 4 and low.count("<div") < 5:
+        add(15, "Layout aus Tabellen gebaut – typisch für Seiten vor 2010", True)
+    if re.search(r"bgcolor=|spacer\.gif|besucherz[äa]hler|g[äa]stebuch|best viewed|optimiert f[üu]r|sie sind besucher", low):
+        add(10, "Typische Elemente alter Homepages (Besucherzähler, Gästebuch, Hintergrundfarben im HTML)")
+    jahre = [int(y) for y in re.findall(r"(?:©|&copy;|copyright)\s*(?:(?:19|20)\d{2}\s*[-–/]\s*)?((?:19|20)\d{2})", low)]
+    if jahre:
+        j = max(jahre)
+        if j <= year - 5:
+            add(20, f"Copyright von {j} – seit Jahren nicht mehr gepflegt", True)
+        elif j <= year - 3:
+            add(10, f"Copyright von {j} – länger nicht aktualisiert")
+    if re.search(r"jquery[-.]?(1\.[0-9])\b|jquery/1\.[0-9]", low):
+        add(10, "Sehr alte Script-Bibliothek (jQuery 1.x)")
+    gen = re.search(r"<meta[^>]+name=[\"']generator[\"'][^>]+content=[\"']([^\"']+)", low)
     if gen:
         g = gen.group(1)
         m = re.search(r"wordpress\s+(\d+)", g)
-        if m and int(m.group(1)) < 6:
-            befunde.append([10, f"Veraltete WordPress-Version ({g}) – Sicherheitsrisiko"])
-        elif re.search(r"jimdo|wix|website ?x5|frontpage|dreamweaver|1&1|ionos", g):
-            befunde.append([5, f"Erstellt mit einfachem Baukasten ({g})"])
+        if (m and int(m.group(1)) < 5) or re.search(r"joomla! 1\.|joomla! 2\.|typo3 [4-6]\.|frontpage|netobjects|dreamweaver|website x5 (evolution|1[0-3])", g):
+            add(15, f"Veraltetes System ({g}) – Sicherheitslücken wahrscheinlich", True)
+    if seite["cert"]:
+        add(15, "Sicherheitswarnung im Browser (Zertifikat ungültig)")
+    elif seite["final"].lower().startswith("http://"):
+        add(10, "Keine verschlüsselte Verbindung – Browser zeigen „Nicht sicher“")
+    return min(60, sum(p for p, _ in out)), out, stark
 
-    if not re.search(r"<title>\s*\S", low):
-        befunde.append([5, "Kein Seitentitel – schlecht für Google"])
-    if 'name="description"' not in low and "name='description'" not in low:
-        befunde.append([5, "Keine Meta-Beschreibung – Google zeigt einen zufälligen Textschnipsel"])
 
-    if ladezeit > 4:
-        befunde.append([10, f"Langsame Serverantwort ({ladezeit:.1f} s)"])
+def analyse_site(url):
+    """Prüft die Startseite einer Website. Liefert (score, kategorie, befunde, impressum_fehlt, veraltet)."""
+    if not re.match(r"^https?://", url, re.I):
+        url = "https://" + url
+    # Immer die Startseite bewerten – eingetragene Unterseiten sind oft Filial- oder Fehlerseiten
+    seite = fetch(startseite(url))
+    if seite is None and url.rstrip("/") != startseite(url).rstrip("/"):
+        seite = fetch(url)
+    if seite is None:
+        return 0, "ignoriert", [[0, "Website liefert nur eine Fehlerseite oder ist nicht erreichbar – ignoriert"]], 0, 0
 
-    ps, lcp = pagespeed(final)
-    if ps is not None:
-        lcp_txt = f", Hauptinhalt nach {lcp:.1f} s sichtbar" if lcp else ""
-        if ps < 50:
-            befunde.append([20, f"Google PageSpeed (Handy): {ps}/100{lcp_txt} – Besucher springen ab"])
-        elif ps < 70:
-            befunde.append([10, f"Google PageSpeed (Handy): {ps}/100{lcp_txt}"])
+    befunde = []
+    imp = hat_impressum(seite)
+    if imp is False:
+        befunde.append([50, "Kein Impressum auffindbar – Pflicht nach § 5 DDG, fehlt es, drohen Abmahnungen"])
+    elif imp is None:
+        befunde.append([0, "Impressum nicht sicher prüfbar (Seite lädt Inhalte per JavaScript) – bitte selbst ansehen"])
 
-    # 100 bleibt für „keine Website“ reserviert
-    score = min(95, sum(p for p, _ in befunde))
-    kategorie = "schwach" if score >= 30 else "ok"
+    dpunkte, dbefunde, stark = design_befunde(seite)
+    veraltet = 1 if (dpunkte >= 35 and stark) else 0
+    befunde += dbefunde
+
+    score = min(95, (50 if imp is False else 0) + (dpunkte if veraltet else dpunkte // 3))
+    kategorie = "kein_impressum" if imp is False else "veraltet" if veraltet else "ok"
     befunde.sort(key=lambda b: -b[0])
-    return score, kategorie, befunde, ps
+    return score, kategorie, befunde, 1 if imp is False else 0, veraltet
 
 
 def check_lead(lead_id):
@@ -376,20 +432,34 @@ def check_lead(lead_id):
     if not r:
         raise KeyError(lead_id)
     website, gefunden = (r["website"] or "").strip(), ""
-    if not website:
-        gefunden = find_website(r["name"], r["ort"])
-    url = website or gefunden
-    if url:
-        score, kat, befunde, ps = analyse_site(url)
-        if gefunden:
-            befunde.insert(0, [0, f"Website nicht im Kartenverzeichnis eingetragen, aber unter {gefunden} gefunden – bitte kurz prüfen"])
+    imp_fehlt = veraltet = 0
+    if website and KEINE_EIGENE_SEITE.search(host_of(website)):
+        score, kat = 100, "keine"
+        befunde = [[100, f"Keine eigene Website – nur ein Eintrag auf {host_of(website)}"]]
     else:
-        score, kat, ps = 100, "keine", None
-        befunde = [[100, "Keine Website gefunden – wer online sucht, findet nur Mitbewerber"]]
+        if not website:
+            gefunden = find_website(r["name"], r["ort"])
+        url = website or gefunden
+        kette = 0
+        if url:
+            with db() as con:
+                hosts = [host_of(x["website"]) for x in con.execute(
+                    "SELECT website FROM leads WHERE website != '' AND id != ?", (lead_id,))]
+            kette = hosts.count(host_of(url))
+        if url and kette + 1 >= KETTE_AB:
+            score, kat = 0, "ignoriert"
+            befunde = [[0, f"Filiale einer Kette – {host_of(url)} gehört zu {kette + 1} Betrieben – ignoriert"]]
+        elif url:
+            score, kat, befunde, imp_fehlt, veraltet = analyse_site(url)
+            if gefunden:
+                befunde.insert(0, [0, f"Website nicht im Kartenverzeichnis eingetragen, aber unter {gefunden} gefunden – bitte kurz prüfen"])
+        else:
+            score, kat = 100, "keine"
+            befunde = [[100, "Keine Website gefunden – wer online sucht, findet nur Mitbewerber"]]
     with DB_LOCK, db() as con:
-        con.execute("""UPDATE leads SET score=?, kategorie=?, befunde=?, pagespeed=?,
+        con.execute("""UPDATE leads SET score=?, kategorie=?, befunde=?, impressum_fehlt=?, veraltet=?,
                        website_gefunden=?, geprueft_am=? WHERE id=?""",
-                    (score, kat, json.dumps(befunde, ensure_ascii=False), ps, gefunden, now(), lead_id))
+                    (score, kat, json.dumps(befunde, ensure_ascii=False), imp_fehlt, veraltet, gefunden, now(), lead_id))
         return row_to_dict(con.execute("SELECT * FROM leads WHERE id=?", (lead_id,)).fetchone())
 
 
@@ -487,7 +557,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self.send(200, f.read(), "text/html; charset=utf-8")
             if method == "GET" and path == "/api/meta":
                 return self.send(200, {"branchen": list(BRANCHEN), "status": STATUS,
-                                       "settings": get_settings(), "pagespeed_key": bool(PAGESPEED_KEY)})
+                                       "settings": get_settings()})
             if method == "GET" and path == "/api/leads":
                 with db() as con:
                     rows = con.execute("SELECT * FROM leads ORDER BY id DESC").fetchall()
@@ -554,7 +624,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send(200, get_settings())
             if method == "GET" and path == "/api/export.csv":
                 cols = ["name", "branche", "strasse", "plz", "ort", "telefon", "email", "website",
-                        "website_gefunden", "score", "kategorie", "pagespeed", "status", "notiz", "geprueft_am"]
+                        "website_gefunden", "score", "kategorie", "impressum_fehlt", "veraltet", "status", "notiz", "geprueft_am"]
                 with db() as con:
                     rows = con.execute("SELECT * FROM leads ORDER BY score DESC").fetchall()
 

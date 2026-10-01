@@ -15,12 +15,16 @@ Kostenlos, ohne Kreditkarte, alle Daten bleiben auf eurem Rechner (`leads.db`).
 
 1. **Suchen:** Branche + Ort + Umkreis wählen → das Tool holt alle Betriebe aus OpenStreetMap.
 2. **Selbst eintragen:** Betriebe, die ihr in Google Maps seht, zeilenweise einfügen: `Name; Ort; Website; Telefon`.
-3. **Automatische Prüfung** jedes Betriebs:
-   - Keine Website eingetragen → Suche nach naheliegenden Domains (`firmenname.de` …).
-     Gefunden wird nur, wenn der Firmenname auch auf der Seite steht.
-   - Website vorhanden → Handy-tauglich? HTTPS? Impressum? Copyright-Jahr? veraltete Technik?
-     Meta-Daten? Ladezeit? Google PageSpeed (Handy).
-4. **Score 0–100:** je höher, desto dringender braucht der Betrieb eine neue Seite (100 = keine Website).
+3. **Automatische Prüfung** jedes Betriebs – bewertet wird immer die **Startseite**:
+   - **Keine Website** (oder nur Facebook/Instagram/Branchenbuch-Eintrag) → Score 100.
+     Ist keine eingetragen, sucht das Tool naheliegende Domains (`firmenname.de` …); gefunden wird nur,
+     wenn der Firmenname auch auf der Seite steht.
+   - **Kein Impressum** → Link auf der Startseite und typische Adressen (`/impressum`, `/impressum.html` …) werden geprüft.
+   - **Veraltetes Design** → nicht handytauglich, alter HTML-Standard, Tabellen-Layout, Font-Tags, Frames, Flash,
+     uraltes Copyright-Jahr, veraltetes CMS, kein HTTPS.
+   - **Ignoriert** werden Fehlerseiten, nicht erreichbare Seiten und Filialketten (gleiche Domain bei 3+ Betrieben).
+     Mit „Ignorierte zeigen“ blendet ihr sie ein.
+4. **Score 0–100:** je höher, desto besser der Kontakt (100 = keine Website, kein Impressum = +50, veraltetes Design bis +60).
 5. Zeile anklicken → Befunde, Notizen, **„Anschreiben“** (druckfertiger Brief als PDF), Link zu Google Maps.
 6. Status pflegen: Neu → Interessant → Angeschrieben → Termin → Kunde.
 7. **CSV-Export** öffnet sich in Excel.
@@ -33,15 +37,5 @@ Steht dort eine, ins Feld „Website“ eintragen und „Neu prüfen“.
 - **Keine Werbe-E-Mails** ohne Einwilligung (§ 7 UWG) – auch nicht an Firmen.
 - **Brief und persönlicher Besuch** sind erlaubt → dafür ist der Bericht gedacht.
 - Wer keinen Kontakt möchte: Eintrag löschen.
-
-## Optional: PageSpeed-Schlüssel
-
-Ohne Schlüssel teilt sich das Tool ein öffentliches Google-Kontingent, das oft aufgebraucht ist – dann wird dieser
-eine Punkt einfach übersprungen. Ein eigener Schlüssel ist **kostenlos und braucht keine Kreditkarte**:
-console.cloud.google.com → Projekt anlegen → „PageSpeed Insights API“ aktivieren → Anmeldedaten → API-Schlüssel.
-Dann vor dem Start setzen:
-
-- Windows: in `start-windows.bat` vor der `where`-Zeile `set PAGESPEED_API_KEY=DEIN_SCHLÜSSEL` einfügen
-- Mac: `PAGESPEED_API_KEY=DEIN_SCHLÜSSEL python3 leadfinder.py`
 
 Datenquelle: © OpenStreetMap-Mitwirkende (ODbL).

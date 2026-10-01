@@ -34,7 +34,7 @@ textarea{width:100%;resize:vertical}
 .legal{background:var(--ochre-t);border-radius:14px;padding:12px 16px;font-size:13.5px;color:#5B4210;margin-bottom:16px}
 .legal summary{cursor:pointer;font-weight:700}
 .legal ul{margin:8px 0 2px;padding-left:1.2em}
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:16px 0}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:16px 0}
 .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer}
 .stat b{display:block;font-size:26px;letter-spacing:-.03em;line-height:1.1}
 .stat span{color:var(--muted);font-size:13px}
@@ -50,7 +50,7 @@ tbody tr.main:hover{background:#FBFBFC;cursor:pointer}
 .score{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:28px;border-radius:8px;font-weight:800;font-size:14px}
 .s-hi{background:var(--brick-t);color:var(--brick)}.s-mid{background:var(--ochre-t);color:#8A6212}.s-lo{background:var(--teal-t);color:var(--teal)}.s-none{background:#F1F2F5;color:var(--muted)}
 .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:#F1F2F5;color:var(--ink-2)}
-.tag.keine{background:var(--brick-t);color:var(--brick)}.tag.schwach,.tag.unerreichbar{background:var(--ochre-t);color:#8A6212}.tag.ok{background:var(--teal-t);color:var(--teal)}
+.tag{margin:2px 4px 0 0}.tag.keine,.tag.kein_impressum{background:var(--brick-t);color:var(--brick)}.tag.veraltet{background:var(--ochre-t);color:#8A6212}.tag.ok{background:var(--teal-t);color:var(--teal)}
 .url{font-size:13px;word-break:break-all;color:var(--ink-2)}
 .detail td{background:#FBFBFC}
 .detail ul{margin:4px 0 10px;padding-left:1.2em}
@@ -119,6 +119,7 @@ dialog h2{margin:0 0 6px}
     <input id="q" placeholder="Suchen…" style="min-width:200px">
     <select id="fStatus"><option value="">Alle Status</option></select>
     <select id="fBranche"><option value="">Alle Branchen</option></select>
+    <label style="display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--ink-2)"><input type="checkbox" id="showIgn" style="width:auto"> Ignorierte zeigen</label>
     <div class="sp"></div>
     <span class="msg" id="mCheck" style="margin:0"></span>
     <button class="btn" id="btnCheckAll">Ungeprüfte prüfen</button>
@@ -156,7 +157,7 @@ dialog h2{margin:0 0 6px}
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const STATUS_LABEL = {neu:'Neu', interessant:'Interessant', angeschrieben:'Angeschrieben', termin:'Termin', kunde:'Kunde ✓', kein_interesse:'Kein Interesse'};
-const KAT_LABEL = {keine:'Keine Website', schwach:'Schwache Website', unerreichbar:'Nicht erreichbar', ok:'Ordentlich'};
+const KAT_LABEL = {keine:'Keine Website', kein_impressum:'Kein Impressum', veraltet:'Veraltetes Design', ok:'Ordentlich', ignoriert:'Ignoriert'};
 let META = {}, LEADS = [], open = null, filter = 'alle', sort = {k:'score', dir:-1};
 const checking = new Set();
 
@@ -187,9 +188,11 @@ function scoreClass(l) {
 function visible() {
   const q = $('#q').value.trim().toLowerCase(), st = $('#fStatus').value, br = $('#fBranche').value;
   return LEADS.filter(l => {
+    if (l.kategorie === 'ignoriert' && !$('#showIgn').checked) return false;
     if (filter === 'ungeprueft' && l.kategorie) return false;
     if (filter === 'keine' && l.kategorie !== 'keine') return false;
-    if (filter === 'schwach' && !['schwach', 'unerreichbar'].includes(l.kategorie)) return false;
+    if (filter === 'impressum' && !l.impressum_fehlt) return false;
+    if (filter === 'veraltet' && !l.veraltet) return false;
     if (filter === 'kunde' && l.status !== 'kunde') return false;
     if (st && l.status !== st) return false;
     if (br && l.branche !== br) return false;
@@ -202,12 +205,22 @@ function visible() {
   });
 }
 
+function tags(l) {
+  if (!l.kategorie) return '';
+  const t = [];
+  if (l.impressum_fehlt) t.push('kein_impressum');
+  if (l.veraltet) t.push('veraltet');
+  if (!t.length) t.push(l.kategorie);
+  return t.map(k => `<span class="tag ${k}">${KAT_LABEL[k] || esc(k)}</span>`).join('');
+}
+
 function render() {
   const c = k => LEADS.filter(k).length;
   const tiles = [
-    ['alle', LEADS.length, 'Betriebe gesamt'],
+    ['alle', c(l => l.kategorie !== 'ignoriert'), 'Betriebe gesamt'],
     ['keine', c(l => l.kategorie === 'keine'), 'ohne Website'],
-    ['schwach', c(l => ['schwach', 'unerreichbar'].includes(l.kategorie)), 'schwache Website'],
+    ['impressum', c(l => l.impressum_fehlt), 'ohne Impressum'],
+    ['veraltet', c(l => l.veraltet), 'veraltetes Design'],
     ['ungeprueft', c(l => !l.kategorie), 'noch ungeprüft'],
     ['kunde', c(l => l.status === 'kunde'), 'gewonnene Kunden'],
   ];
@@ -226,7 +239,7 @@ function render() {
     let html = `<tr class="main" data-id="${l.id}">
       <td><span class="score ${scoreClass(l)}">${sc}</span></td>
       <td><div class="name">${esc(l.name)}</div><div class="addr">${esc(adr)}</div>
-          ${l.kategorie ? `<span class="tag ${l.kategorie}">${KAT_LABEL[l.kategorie]}</span>` : ''}</td>
+          ${tags(l)}</td>
       <td class="hide-m">${esc(l.branche)}</td>
       <td class="hide-m url">${url ? esc(url.replace(/^https?:\/\//, '').replace(/\/$/, '')) : '<span style="color:var(--muted)">—</span>'}</td>
       <td><select data-status="${l.id}">${META.status.map(s => `<option value="${s}" ${s === l.status ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('')}</select></td>
@@ -323,7 +336,7 @@ $('#btnCheckAll').addEventListener('click', () => {
 });
 
 $('#stats').addEventListener('click', e => { const t = e.target.closest('[data-f]'); if (t) { filter = t.dataset.f; render(); } });
-['#q', '#fStatus', '#fBranche'].forEach(s => $(s).addEventListener('input', render));
+['#q', '#fStatus', '#fBranche', '#showIgn'].forEach(s => $(s).addEventListener('input', render));
 document.querySelector('thead').addEventListener('click', e => {
   const k = e.target.dataset.sort; if (!k) return;
   sort = {k, dir: sort.k === k ? -sort.dir : (k === 'score' ? -1 : 1)}; render();
