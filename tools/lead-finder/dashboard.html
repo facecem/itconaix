@@ -59,6 +59,7 @@ tbody tr.main:hover{background:#FBFBFC;cursor:pointer}
 .dgrid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
 label.f{display:block;font-size:12.5px;color:var(--muted);font-weight:600;margin:8px 0 3px}
 label.f input{width:100%}
+.ki{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:6px;font-size:14px}.ki p{margin:6px 0}.ki ul{margin:2px 0 8px}
 .empty{text-align:center;color:var(--muted);padding:40px}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -73,7 +74,7 @@ dialog h2{margin:0 0 6px}
   <div class="logo">IT con<span>AIX</span><small>Lead-Finder</small></div>
   <div class="sp"></div>
   <a class="btn" href="/api/export.csv">CSV-Export</a>
-  <button class="btn" id="btnSettings">Absender</button>
+  <button class="btn" id="btnSettings">Einstellungen</button>
 </div></header>
 
 <main>
@@ -123,6 +124,7 @@ dialog h2{margin:0 0 6px}
     <div class="sp"></div>
     <span class="msg" id="mCheck" style="margin:0"></span>
     <button class="btn" id="btnCheckAll">Ungeprüfte prüfen</button>
+    <button class="btn" id="btnKiAll">Mit Claude bewerten</button>
   </div>
 
   <table>
@@ -131,6 +133,7 @@ dialog h2{margin:0 0 6px}
       <th data-sort="name">Betrieb</th>
       <th data-sort="branche" class="hide-m">Branche</th>
       <th class="hide-m">Website</th>
+      <th data-sort="ki_potenzial" style="width:80px" title="Kundenpotenzial laut Claude">Claude</th>
       <th data-sort="status" style="width:150px">Status</th>
     </tr></thead>
     <tbody id="tbody"></tbody>
@@ -139,13 +142,15 @@ dialog h2{margin:0 0 6px}
 
 <dialog id="dlgSettings">
   <form method="dialog" id="fSettings">
-    <h2>Absender</h2>
+    <h2>Einstellungen</h2>
     <label class="f">Firma<input name="firma"></label>
     <label class="f">Ansprechpartner<input name="ansprechpartner"></label>
     <label class="f">Telefon<input name="telefon"></label>
     <label class="f">E-Mail<input name="email"></label>
     <label class="f">Website<input name="web"></label>
     <label class="f">Preis-Angabe<input name="preis"></label>
+    <label class="f">Claude-API-Schlüssel<input name="anthropic_key" type="password" autocomplete="off" placeholder="sk-ant-…"></label>
+    <p class="addr" id="kiHinweis" style="margin:4px 0 0"></p>
     <div class="row" style="margin-top:16px;justify-content:flex-end">
       <button class="btn" value="cancel" formnovalidate>Abbrechen</button>
       <button class="btn pri" value="save">Speichern</button>
@@ -229,7 +234,7 @@ function render() {
 
   const rows = visible();
   if (!rows.length) {
-    $('#tbody').innerHTML = `<tr><td colspan="5" class="empty">${LEADS.length ? 'Keine Treffer für diesen Filter.' : 'Noch keine Betriebe.'}</td></tr>`;
+    $('#tbody').innerHTML = `<tr><td colspan="6" class="empty">${LEADS.length ? 'Keine Treffer für diesen Filter.' : 'Noch keine Betriebe.'}</td></tr>`;
     return;
   }
   $('#tbody').innerHTML = rows.map(l => {
@@ -242,6 +247,7 @@ function render() {
           ${tags(l)}</td>
       <td class="hide-m">${esc(l.branche)}</td>
       <td class="hide-m url">${url ? esc(url.replace(/^https?:\/\//, '').replace(/\/$/, '')) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${kiBadge(l)}</td>
       <td><select data-status="${l.id}">${META.status.map(s => `<option value="${s}" ${s === l.status ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('')}</select></td>
     </tr>`;
     if (open === l.id) html += detail(l, url);
@@ -254,7 +260,7 @@ function detail(l, url) {
   const bef = l.befunde.length
     ? `<ul>${l.befunde.map(([p, t]) => `<li>${p ? `<span class="pts">+${p}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`
     : '<p style="color:var(--muted)">Noch nicht geprüft.</p>';
-  return `<tr class="detail"><td colspan="5"><div class="dgrid">
+  return `<tr class="detail"><td colspan="6"><div class="dgrid">
     <div>
       <b>Befunde</b>${l.geprueft_am ? ` <span class="addr">geprüft ${esc(l.geprueft_am.replace('T', ' '))}</span>` : ''}
       ${bef}
@@ -267,12 +273,47 @@ function detail(l, url) {
       </div>
     </div>
     <div>
+      ${kiBlock(l)}
       <label class="f">Website<input data-field="website" data-id="${l.id}" value="${esc(l.website)}"></label>
       <label class="f">Telefon<input data-field="telefon" data-id="${l.id}" value="${esc(l.telefon)}"></label>
       <label class="f">E-Mail<input data-field="email" data-id="${l.id}" value="${esc(l.email)}"></label>
       <label class="f">Notiz<textarea rows="3" data-field="notiz" data-id="${l.id}">${esc(l.notiz)}</textarea></label>
     </div>
   </div></td></tr>`;
+}
+
+function kiBadge(l) {
+  if (kiRunning.has(l.id)) return '<span class="score s-none"><span class="spin"></span></span>';
+  if (l.ki_potenzial == null) return '<span class="addr">–</span>';
+  const c = l.ki_potenzial >= 65 ? 's-hi' : l.ki_potenzial >= 40 ? 's-mid' : 's-lo';
+  return `<span class="score ${c}" title="${esc(l.ki.einstufung)}es Potenzial">${l.ki_potenzial}</span>`;
+}
+
+function kiBlock(l) {
+  const k = l.ki, ok = META.ki.bereit;
+  const btn = l.kategorie === 'ignoriert' ? '' :
+    `<button class="btn sm" data-act="ki" data-id="${l.id}" ${ok && !kiRunning.has(l.id) ? '' : 'disabled'} title="${esc(META.ki.grund)}">${kiRunning.has(l.id) ? 'Claude bewertet…' : k ? 'Neu bewerten' : 'Mit Claude bewerten'}</button>`;
+  if (!k) return `<div class="ki"><b>Claude-Bewertung</b> ${btn}${ok ? '' : `<div class="addr">${esc(META.ki.grund)}</div>`}</div>`;
+  const li = a => a.length ? `<ul>${a.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="addr">–</p>';
+  return `<div class="ki">
+    <div class="row" style="justify-content:space-between"><b>Claude: ${esc(k.einstufung)}es Potenzial (${k.potenzial}/100)</b>${btn}</div>
+    <p>${esc(k.zusammenfassung)}</p>
+    <p><b>Betrieb:</b> ${esc(k.betrieb)}</p>
+    <p><b>Website:</b> ${esc(k.website_zustand)}</p>
+    <b>Verkaufsargumente</b>${li(k.verkaufsargumente)}
+    <b>Bedenken</b>${li(k.bedenken)}
+    <p><b>Angebot:</b> ${esc(k.empfohlenes_angebot)}</p>
+    <p><b>Einstieg:</b> „${esc(k.einstieg)}“</p>
+    <div class="addr">bewertet ${esc((l.ki_am || '').replace('T', ' '))}${k.kosten_usd != null ? ` · ca. ${k.kosten_usd.toFixed(3).replace('.', ',')} $` : ''}</div>
+  </div>`;
+}
+
+const kiRunning = new Set();
+async function kiOne(id) {
+  kiRunning.add(id); render();
+  try { replace(await api(`/api/leads/${id}/ki`, {method: 'POST'})); return true; }
+  catch (e) { $('#mCheck').textContent = 'Claude: ' + e.message; return false; }
+  finally { kiRunning.delete(id); render(); }
 }
 
 function replace(l) { const i = LEADS.findIndex(x => x.id === l.id); if (i >= 0) LEADS[i] = l; }
@@ -335,6 +376,24 @@ $('#btnCheckAll').addEventListener('click', () => {
   checkMany(ids);
 });
 
+$('#btnKiAll').addEventListener('click', async () => {
+  if (!META.ki.bereit) { alert(META.ki.grund); return; }
+  const ids = visible().filter(l => l.kategorie && l.kategorie !== 'ignoriert' && !l.ki).map(l => l.id);
+  if (!ids.length) { $('#mCheck').textContent = 'Alle geprüften Betriebe in dieser Ansicht sind schon bewertet.'; return; }
+  if (!confirm(`${ids.length} Betriebe mit Claude bewerten?\nKosten ca. 0,05–0,10 $ pro Betrieb (zusammen etwa ${(ids.length * 0.08).toFixed(2).replace('.', ',')} $).`)) return;
+  const btn = $('#btnKiAll'); btn.disabled = true;
+  const todo = [...ids]; let done = 0, fehler = 0;
+  const worker = async () => {
+    while (todo.length) {
+      if (!await kiOne(todo.shift())) fehler++;
+      $('#mCheck').textContent = `Claude bewertet… ${++done}/${ids.length}`;
+    }
+  };
+  await Promise.all([worker(), worker()]);
+  $('#mCheck').textContent = `${ids.length - fehler} bewertet${fehler ? `, ${fehler} fehlgeschlagen` : ''}.`;
+  btn.disabled = false;
+});
+
 $('#stats').addEventListener('click', e => { const t = e.target.closest('[data-f]'); if (t) { filter = t.dataset.f; render(); } });
 ['#q', '#fStatus', '#fBranche', '#showIgn'].forEach(s => $(s).addEventListener('input', render));
 document.querySelector('thead').addEventListener('click', e => {
@@ -347,6 +406,7 @@ $('#tbody').addEventListener('click', async e => {
   if (act) {
     const id = +act.dataset.id;
     if (act.dataset.act === 'check') checkOne(id);
+    if (act.dataset.act === 'ki') kiOne(id);
     if (act.dataset.act === 'del' && confirm('Eintrag endgültig löschen?')) {
       await api(`/api/leads/${id}`, {method: 'DELETE'});
       LEADS = LEADS.filter(l => l.id !== id); open = null; render();
@@ -369,11 +429,14 @@ $('#tbody').addEventListener('change', async e => {
 $('#btnSettings').addEventListener('click', () => {
   const f = $('#fSettings');
   for (const [k, v] of Object.entries(META.settings)) if (f.elements[k]) f.elements[k].value = v;
+  f.elements.anthropic_key.value = '';
+  $('#kiHinweis').textContent = META.settings.anthropic_key_hinweis ? `Schlüssel gespeichert (${META.settings.anthropic_key_hinweis}). Feld leer lassen, um ihn zu behalten.` : 'Nur nötig für „Mit Claude bewerten“. Bleibt auf diesem Rechner.';
   $('#dlgSettings').showModal();
 });
 $('#dlgSettings').addEventListener('close', async () => {
   if ($('#dlgSettings').returnValue !== 'save') return;
-  META.settings = await api('/api/settings', {method: 'POST', body: Object.fromEntries(new FormData($('#fSettings')))});
+  const r = await api('/api/settings', {method: 'POST', body: Object.fromEntries(new FormData($('#fSettings')))});
+  META.settings = r.settings; META.ki = r.ki; render();
 });
 
 function fatal(html) {

@@ -29,6 +29,20 @@ Kostenlos, ohne Kreditkarte, alle Daten bleiben auf eurem Rechner (`leads.db`).
 6. Status pflegen: Neu → Interessant → Angeschrieben → Termin → Kunde.
 7. **CSV-Export** öffnet sich in Excel.
 
+## Claude-Bewertung (optional)
+
+Mit **„Mit Claude bewerten“** schickt das Tool Startseite, Impressum und Prüfergebnisse eines Betriebs an Claude.
+Zurück kommt eine Einschätzung des **Kundenpotenzials (0–100)** mit Begründung, Verkaufsargumenten, Bedenken,
+passendem Angebot und einem Satz für den Gesprächseinstieg. Die Spalte „Claude“ lässt sich sortieren.
+
+Einrichtung:
+1. Auf https://platform.claude.com ein Konto anlegen, Guthaben aufladen (Kreditkarte nötig) und einen API-Schlüssel erstellen.
+2. Im Dashboard unter **Einstellungen → Claude-API-Schlüssel** eintragen. Der Schlüssel bleibt in `leads.db` auf eurem Rechner.
+
+Kosten: etwa 0,05–0,10 $ pro Betrieb (Modell Claude Opus 5.5). Am besten nur die Betriebe bewerten, die die
+automatische Prüfung schon als „ohne Website“, „ohne Impressum“ oder „veraltetes Design“ markiert hat.
+Die Startdateien installieren das nötige Python-Paket `anthropic` beim Start automatisch.
+
 Tipp: Vor dem Anschreiben einmal „Google Maps“ klicken – OpenStreetMap kennt nicht jede Website.
 Steht dort eine, ins Feld „Website“ eintragen und „Neu prüfen“.
 
