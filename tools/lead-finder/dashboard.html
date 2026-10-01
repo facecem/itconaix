@@ -295,7 +295,7 @@ $('#fSearch').addEventListener('submit', async e => {
   e.preventDefault();
   const m = $('#mSearch'), b = $('#btnSearch'), ort = $('#sOrt').value.trim();
   try { localStorage.setItem('lf_ort', ort); } catch (e) {}
-  m.className = 'msg'; m.innerHTML = '<span class="spin"></span> Suche in OpenStreetMap… (kann bis zu einer Minute dauern)';
+  m.className = 'msg'; m.innerHTML = '<span class="spin"></span> Suche in OpenStreetMap… (meist unter einer Minute; sind die Server ausgelastet, probiert das Tool automatisch weitere)';
   b.disabled = true;
   const before = new Set(LEADS.map(l => l.id));
   try {

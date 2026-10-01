@@ -10,6 +10,7 @@ Start:  python leadfinder.py      -> öffnet http://127.0.0.1:8765
 import datetime as dt
 import html
 import json
+import math
 import os
 import re
 import socket
@@ -32,8 +33,11 @@ PAGESPEED_KEY = os.environ.get("PAGESPEED_API_KEY", "").strip()
 USER_AGENT = "itconaix-leadfinder/1.0 (+https://itconaix.de; hallo@itconaix.de)"
 BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+# Öffentliche Overpass-Server; sind oft ausgelastet, daher mehrere der Reihe nach
 OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
 ]
 
@@ -150,15 +154,24 @@ def geocode(ort):
 
 
 def overpass(query):
-    last = None
-    for url in OVERPASS_URLS:
-        try:
-            _, _, _, body = http_get(url, timeout=90,
-                                     data=urllib.parse.urlencode({"data": query}).encode())
-            return json.loads(body)["elements"]
-        except Exception as e:  # nächsten Server versuchen
-            last = e
-    raise RuntimeError(f"OpenStreetMap-Abfrage fehlgeschlagen: {last}")
+    fehler = []
+    data = urllib.parse.urlencode({"data": query}).encode()
+    for runde in range(2):
+        for url in OVERPASS_URLS:
+            try:
+                _, _, _, body = http_get(url, timeout=40, data=data, max_bytes=50_000_000)
+                return json.loads(body)["elements"]
+            except Exception as e:  # nächsten Server versuchen
+                fehler.append(f"{urllib.parse.urlparse(url).hostname}: {e}")
+        time.sleep(3)
+    raise RuntimeError("Die OpenStreetMap-Server sind gerade überlastet – bitte in ein paar Minuten "
+                       "nochmal versuchen. (" + "; ".join(fehler[-len(OVERPASS_URLS):]) + ")")
+
+
+def distanz_m(lat1, lon1, lat2, lon2):
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    a = math.sin((p2 - p1) / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lon2 - lon1) / 2) ** 2
+    return 12_742_000 * math.asin(math.sqrt(a))
 
 
 def osm_search(branche, ort, radius_km):
@@ -167,15 +180,21 @@ def osm_search(branche, ort, radius_km):
         raise ValueError("Unbekannte Branche")
     lat, lon, label = geocode(ort)
     r = int(float(radius_km) * 1000)
+    # Bounding-Box statt around: deutlich schneller auf den Servern; Kreis danach selbst filtern
+    dlat = r / 111_320
+    dlon = r / (111_320 * max(0.2, math.cos(math.radians(lat))))
+    bbox = f"{lat - dlat:.5f},{lon - dlon:.5f},{lat + dlat:.5f},{lon + dlon:.5f}"
     parts = []
     for k, v in tags:
         sel = f'["{k}"]' if v is None else f'["{k}"="{v}"]'
-        parts.append(f'nwr{sel}["name"](around:{r},{lat},{lon});')
-    q = f'[out:json][timeout:80];({"".join(parts)});out center tags;'
+        parts.append(f'nwr{sel}["name"]({bbox});')
+    q = f'[out:json][timeout:30];({"".join(parts)});out center tags;'
     found = []
     for e in overpass(q):
         t = e.get("tags", {})
         c = e.get("center") or e
+        if c.get("lat") is not None and distanz_m(lat, lon, c["lat"], c["lon"]) > r:
+            continue
         found.append({
             "osm_id": f'{e["type"]}/{e["id"]}',
             "name": t.get("name", "").strip(),
