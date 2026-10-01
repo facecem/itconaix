@@ -1,0 +1,4 @@
+# Kundendaten bleiben lokal
+leads.db
+leads.db-*
+__pycache__/
