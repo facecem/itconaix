@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead-Finder – IT conAIX</title>
+<style>
+:root{--bg:#FAFAFB;--card:#fff;--ink:#0E1116;--ink-2:#3B4250;--muted:#6B7280;--line:#E7E8EC;--navy:#14264A;--teal:#2E7C86;--ochre:#D9A441;--brick:#B5462C;
+  --teal-t:rgba(46,124,134,.13);--ochre-t:rgba(217,164,65,.18);--brick-t:rgba(181,70,44,.12);--navy-t:rgba(20,38,74,.08)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;background:rgba(250,250,251,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header .in{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:12px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.04em}.logo span{color:var(--teal)}.logo small{font-weight:600;color:var(--muted);letter-spacing:0;font-size:14px;margin-left:8px}
+header .sp{flex:1}
+main{max-width:1280px;margin:0 auto;padding:20px}
+.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap;text-decoration:none;display:inline-block;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}.btn.pri:hover{background:var(--navy)}
+.btn.sm{padding:5px 10px;font-size:13px;border-radius:8px}
+.btn.danger{color:var(--brick)}
+.btn:disabled{opacity:.5;cursor:default}
+.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card h2{margin:0 0 12px;font-size:16px;letter-spacing:-.01em}
+.card p.sub{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal-t);border-color:var(--teal)}
+textarea{width:100%;resize:vertical}
+.msg{margin-top:10px;font-size:13.5px;color:var(--ink-2);min-height:1.5em}
+.msg.err{color:var(--brick)}
+.legal{background:var(--ochre-t);border-radius:14px;padding:12px 16px;font-size:13.5px;color:#5B4210;margin-bottom:16px}
+.legal summary{cursor:pointer;font-weight:700}
+.legal ul{margin:8px 0 2px;padding-left:1.2em}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:16px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer}
+.stat b{display:block;font-size:26px;letter-spacing:-.03em;line-height:1.1}
+.stat span{color:var(--muted);font-size:13px}
+.stat.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.toolbar .sp{flex:1}
+table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;color:var(--muted);font-weight:600;background:#FBFBFC;cursor:pointer;user-select:none}
+tr:last-child td{border-bottom:0}
+tbody tr.main:hover{background:#FBFBFC;cursor:pointer}
+.name{font-weight:650}.addr{color:var(--muted);font-size:13px}
+.score{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:28px;border-radius:8px;font-weight:800;font-size:14px}
+.s-hi{background:var(--brick-t);color:var(--brick)}.s-mid{background:var(--ochre-t);color:#8A6212}.s-lo{background:var(--teal-t);color:var(--teal)}.s-none{background:#F1F2F5;color:var(--muted)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:#F1F2F5;color:var(--ink-2)}
+.tag{margin:2px 4px 0 0}.tag.keine,.tag.kein_impressum{background:var(--brick-t);color:var(--brick)}.tag.veraltet{background:var(--ochre-t);color:#8A6212}.tag.ok{background:var(--teal-t);color:var(--teal)}
+.url{font-size:13px;word-break:break-all;color:var(--ink-2)}
+.detail td{background:#FBFBFC}
+.detail ul{margin:4px 0 10px;padding-left:1.2em}
+.detail li{margin:3px 0}
+.detail .pts{display:inline-block;min-width:40px;margin-right:4px;font-weight:700;color:var(--brick);font-size:12.5px}
+.dgrid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+label.f{display:block;font-size:12.5px;color:var(--muted);font-weight:600;margin:8px 0 3px}
+label.f input{width:100%}
+.ki{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:6px;font-size:14px}.ki p{margin:6px 0}.ki ul{margin:2px 0 8px}
+.empty{text-align:center;color:var(--muted);padding:40px}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+dialog{border:0;border-radius:18px;padding:22px;width:min(460px,calc(100vw - 32px));box-shadow:0 30px 70px -25px rgba(14,17,22,.45)}
+dialog::backdrop{background:rgba(14,17,22,.35)}
+dialog h2{margin:0 0 6px}
+@media(max-width:900px){header .in{padding:10px 16px;gap:8px}header .btn{padding:6px 10px;font-size:13px}.logo small{display:none}main{padding:16px}.grid,.dgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.hide-m{display:none}}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="logo">IT con<span>AIX</span><small>Lead-Finder</small></div>
+  <div class="sp"></div>
+  <a class="btn" href="/api/export.csv">CSV-Export</a>
+  <button class="btn" id="btnSettings">Einstellungen</button>
+</div></header>
+
+<main>
+  <details class="legal">
+    <summary>⚖️ Regeln für die Kontaktaufnahme</summary>
+    <ul>
+      <li><b>Keine Werbe-E-Mails ohne Einwilligung</b> – auch nicht an Firmen (§ 7 UWG). Abmahngefahr.</li>
+      <li><b>Brief per Post</b> und <b>persönlicher Besuch</b> sind erlaubt. Der Button „Bericht“ erzeugt dafür ein druckfertiges Anschreiben.</li>
+      <li><b>Anrufe bei Firmen</b> nur mit konkretem Anlass – im Zweifel lieber Brief.</li>
+      <li>Wer keinen Kontakt möchte: Status „kein Interesse“ setzen bzw. den Eintrag <b>löschen</b> (DSGVO).</li>
+      <li>Alle Daten bleiben auf diesem Rechner (Datei <code>leads.db</code>).</li>
+    </ul>
+  </details>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Betriebe suchen</h2>
+      <form id="fSearch" class="row">
+        <select id="sBranche" required></select>
+        <input id="sOrt" placeholder="Ort" required style="flex:1;min-width:140px">
+        <select id="sRadius" title="Umkreis">
+          <option value="3">3 km</option><option value="5">5 km</option><option value="10" selected>10 km</option><option value="20">20 km</option><option value="30">30 km</option>
+        </select>
+        <button class="btn pri" id="btnSearch">Suchen</button>
+      </form>
+      <label style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:13.5px;color:var(--ink-2)">
+        <input type="checkbox" id="autoCheck" checked style="width:auto"> Direkt prüfen
+      </label>
+      <div class="msg" id="mSearch"></div>
+    </section>
+
+    <section class="card">
+      <h2>Selbst eintragen</h2>
+      <textarea id="manual" rows="3" placeholder="Name; Ort; Website; Telefon  (eine Zeile pro Betrieb)"></textarea>
+      <div class="row" style="margin-top:8px"><button class="btn pri" id="btnManual">Hinzufügen &amp; prüfen</button></div>
+      <div class="msg" id="mManual"></div>
+    </section>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <input id="q" placeholder="Suchen…" style="min-width:200px">
+    <select id="fStatus"><option value="">Alle Status</option></select>
+    <select id="fBranche"><option value="">Alle Branchen</option></select>
+    <label style="display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--ink-2)"><input type="checkbox" id="showIgn" style="width:auto"> Ignorierte zeigen</label>
+    <div class="sp"></div>
+    <span class="msg" id="mCheck" style="margin:0"></span>
+    <button class="btn" id="btnCheckAll">Ungeprüfte prüfen</button>
+    <button class="btn" id="btnKiAll">Mit Claude bewerten</button>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th data-sort="score" style="width:70px">Score</th>
+      <th data-sort="name">Betrieb</th>
+      <th data-sort="branche" class="hide-m">Branche</th>
+      <th class="hide-m">Website</th>
+      <th data-sort="ki_potenzial" style="width:80px" title="Kundenpotenzial laut Claude">Claude</th>
+      <th data-sort="status" style="width:150px">Status</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</main>
+
+<dialog id="dlgSettings">
+  <form method="dialog" id="fSettings">
+    <h2>Einstellungen</h2>
+    <label class="f">Firma<input name="firma"></label>
+    <label class="f">Ansprechpartner<input name="ansprechpartner"></label>
+    <label class="f">Telefon<input name="telefon"></label>
+    <label class="f">E-Mail<input name="email"></label>
+    <label class="f">Website<input name="web"></label>
+    <label class="f">Preis-Angabe<input name="preis"></label>
+    <label class="f">Claude-API-Schlüssel<input name="anthropic_key" type="password" autocomplete="off" placeholder="sk-ant-…"></label>
+    <p class="addr" id="kiHinweis" style="margin:4px 0 0"></p>
+    <div class="row" style="margin-top:16px;justify-content:flex-end">
+      <button class="btn" value="cancel" formnovalidate>Abbrechen</button>
+      <button class="btn pri" value="save">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const STATUS_LABEL = {neu:'Neu', interessant:'Interessant', angeschrieben:'Angeschrieben', termin:'Termin', kunde:'Kunde ✓', kein_interesse:'Kein Interesse'};
+const KAT_LABEL = {keine:'Keine Website', kein_impressum:'Kein Impressum', veraltet:'Veraltetes Design', ok:'Ordentlich', ignoriert:'Ignoriert'};
+let META = {}, LEADS = [], open = null, filter = 'alle', sort = {k:'score', dir:-1};
+const checking = new Set();
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, {headers: {'Content-Type': 'application/json'}, ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined});
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || r.statusText);
+  return d;
+}
+
+async function init() {
+  META = await api('/api/meta');
+  $('#sBranche').innerHTML = META.branchen.map(b => `<option>${esc(b)}</option>`).join('');
+  $('#fStatus').innerHTML += META.status.map(s => `<option value="${s}">${STATUS_LABEL[s]}</option>`).join('');
+  $('#fBranche').innerHTML += META.branchen.map(b => `<option>${esc(b)}</option>`).join('');
+  try { $('#sOrt').value = localStorage.getItem('lf_ort') || ''; } catch (e) {}
+  await load();
+}
+
+async function load() { LEADS = await api('/api/leads'); render(); }
+
+function scoreClass(l) {
+  if (l.score == null) return 's-none';
+  return l.score >= 60 ? 's-hi' : l.score >= 30 ? 's-mid' : 's-lo';
+}
+
+function visible() {
+  const q = $('#q').value.trim().toLowerCase(), st = $('#fStatus').value, br = $('#fBranche').value;
+  return LEADS.filter(l => {
+    if (l.kategorie === 'ignoriert' && !$('#showIgn').checked) return false;
+    if (filter === 'ungeprueft' && l.kategorie) return false;
+    if (filter === 'keine' && l.kategorie !== 'keine') return false;
+    if (filter === 'impressum' && !l.impressum_fehlt) return false;
+    if (filter === 'veraltet' && !l.veraltet) return false;
+    if (filter === 'kunde' && l.status !== 'kunde') return false;
+    if (st && l.status !== st) return false;
+    if (br && l.branche !== br) return false;
+    if (q && !`${l.name} ${l.ort} ${l.strasse} ${l.website} ${l.notiz}`.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) => {
+    let x = a[sort.k] ?? -1, y = b[sort.k] ?? -1;
+    if (typeof x === 'string') return x.localeCompare(y) * sort.dir;
+    return (x - y) * sort.dir;
+  });
+}
+
+function tags(l) {
+  if (!l.kategorie) return '';
+  const t = [];
+  if (l.impressum_fehlt) t.push('kein_impressum');
+  if (l.veraltet) t.push('veraltet');
+  if (!t.length) t.push(l.kategorie);
+  return t.map(k => `<span class="tag ${k}">${KAT_LABEL[k] || esc(k)}</span>`).join('');
+}
+
+function render() {
+  const c = k => LEADS.filter(k).length;
+  const tiles = [
+    ['alle', c(l => l.kategorie !== 'ignoriert'), 'Betriebe gesamt'],
+    ['keine', c(l => l.kategorie === 'keine'), 'ohne Website'],
+    ['impressum', c(l => l.impressum_fehlt), 'ohne Impressum'],
+    ['veraltet', c(l => l.veraltet), 'veraltetes Design'],
+    ['ungeprueft', c(l => !l.kategorie), 'noch ungeprüft'],
+    ['kunde', c(l => l.status === 'kunde'), 'gewonnene Kunden'],
+  ];
+  $('#stats').innerHTML = tiles.map(([k, n, t]) =>
+    `<div class="stat ${filter === k ? 'on' : ''}" data-f="${k}"><b>${n}</b><span>${t}</span></div>`).join('');
+
+  const rows = visible();
+  if (!rows.length) {
+    $('#tbody').innerHTML = `<tr><td colspan="6" class="empty">${LEADS.length ? 'Keine Treffer für diesen Filter.' : 'Noch keine Betriebe.'}</td></tr>`;
+    return;
+  }
+  $('#tbody').innerHTML = rows.map(l => {
+    const url = l.website || l.website_gefunden;
+    const adr = [l.strasse, [l.plz, l.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    const sc = checking.has(l.id) ? '<span class="spin"></span>' : (l.score ?? '–');
+    let html = `<tr class="main" data-id="${l.id}">
+      <td><span class="score ${scoreClass(l)}">${sc}</span></td>
+      <td><div class="name">${esc(l.name)}</div><div class="addr">${esc(adr)}</div>
+          ${tags(l)}</td>
+      <td class="hide-m">${esc(l.branche)}</td>
+      <td class="hide-m url">${url ? esc(url.replace(/^https?:\/\//, '').replace(/\/$/, '')) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${kiBadge(l)}</td>
+      <td><select data-status="${l.id}">${META.status.map(s => `<option value="${s}" ${s === l.status ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('')}</select></td>
+    </tr>`;
+    if (open === l.id) html += detail(l, url);
+    return html;
+  }).join('');
+}
+
+function detail(l, url) {
+  const maps = 'https://www.google.com/maps/search/' + encodeURIComponent([l.name, l.strasse, l.ort].filter(Boolean).join(' '));
+  const bef = l.befunde.length
+    ? `<ul>${l.befunde.map(([p, t]) => `<li>${p ? `<span class="pts">+${p}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`
+    : '<p style="color:var(--muted)">Noch nicht geprüft.</p>';
+  return `<tr class="detail"><td colspan="6"><div class="dgrid">
+    <div>
+      <b>Befunde</b>${l.geprueft_am ? ` <span class="addr">geprüft ${esc(l.geprueft_am.replace('T', ' '))}</span>` : ''}
+      ${bef}
+      <div class="row">
+        <button class="btn sm" data-act="check" data-id="${l.id}">${l.kategorie ? 'Neu prüfen' : 'Jetzt prüfen'}</button>
+        <a class="btn sm" href="/api/leads/${l.id}/report" target="_blank" rel="noopener">Anschreiben</a>
+        <a class="btn sm" href="${maps}" target="_blank" rel="noopener">Google Maps</a>
+        ${url ? `<a class="btn sm" href="${esc(/^https?:/i.test(url) ? url : 'https://' + url)}" target="_blank" rel="noopener">Website öffnen</a>` : ''}
+        <button class="btn sm danger" data-act="del" data-id="${l.id}">Löschen</button>
+      </div>
+    </div>
+    <div>
+      ${kiBlock(l)}
+      <label class="f">Website<input data-field="website" data-id="${l.id}" value="${esc(l.website)}"></label>
+      <label class="f">Telefon<input data-field="telefon" data-id="${l.id}" value="${esc(l.telefon)}"></label>
+      <label class="f">E-Mail<input data-field="email" data-id="${l.id}" value="${esc(l.email)}"></label>
+      <label class="f">Notiz<textarea rows="3" data-field="notiz" data-id="${l.id}">${esc(l.notiz)}</textarea></label>
+    </div>
+  </div></td></tr>`;
+}
+
+function kiBadge(l) {
+  if (kiRunning.has(l.id)) return '<span class="score s-none"><span class="spin"></span></span>';
+  if (l.ki_potenzial == null) return '<span class="addr">–</span>';
+  const c = l.ki_potenzial >= 65 ? 's-hi' : l.ki_potenzial >= 40 ? 's-mid' : 's-lo';
+  return `<span class="score ${c}" title="${esc(l.ki.einstufung)}es Potenzial">${l.ki_potenzial}</span>`;
+}
+
+function kiBlock(l) {
+  const k = l.ki, ok = META.ki.bereit;
+  const btn = l.kategorie === 'ignoriert' ? '' :
+    `<button class="btn sm" data-act="ki" data-id="${l.id}" ${ok && !kiRunning.has(l.id) ? '' : 'disabled'} title="${esc(META.ki.grund)}">${kiRunning.has(l.id) ? 'Claude bewertet…' : k ? 'Neu bewerten' : 'Mit Claude bewerten'}</button>`;
+  if (!k) return `<div class="ki"><b>Claude-Bewertung</b> ${btn}${ok ? '' : `<div class="addr">${esc(META.ki.grund)}</div>`}</div>`;
+  const li = a => a.length ? `<ul>${a.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="addr">–</p>';
+  return `<div class="ki">
+    <div class="row" style="justify-content:space-between"><b>Claude: ${esc(k.einstufung)}es Potenzial (${k.potenzial}/100)</b>${btn}</div>
+    <p>${esc(k.zusammenfassung)}</p>
+    <p><b>Betrieb:</b> ${esc(k.betrieb)}</p>
+    <p><b>Website:</b> ${esc(k.website_zustand)}</p>
+    <b>Verkaufsargumente</b>${li(k.verkaufsargumente)}
+    <b>Bedenken</b>${li(k.bedenken)}
+    <p><b>Angebot:</b> ${esc(k.empfohlenes_angebot)}</p>
+    <p><b>Einstieg:</b> „${esc(k.einstieg)}“</p>
+    <div class="addr">bewertet ${esc((l.ki_am || '').replace('T', ' '))}${k.kosten_usd != null ? ` · ca. ${k.kosten_usd.toFixed(3).replace('.', ',')} $` : ''}</div>
+  </div>`;
+}
+
+const kiRunning = new Set();
+async function kiOne(id) {
+  kiRunning.add(id); render();
+  try { replace(await api(`/api/leads/${id}/ki`, {method: 'POST'})); return true; }
+  catch (e) { $('#mCheck').textContent = 'Claude: ' + e.message; return false; }
+  finally { kiRunning.delete(id); render(); }
+}
+
+function replace(l) { const i = LEADS.findIndex(x => x.id === l.id); if (i >= 0) LEADS[i] = l; }
+
+async function checkOne(id) {
+  checking.add(id); render();
+  try { replace(await api(`/api/leads/${id}/check`, {method: 'POST'})); }
+  catch (e) { $('#mCheck').textContent = 'Fehler: ' + e.message; }
+  finally { checking.delete(id); render(); }
+}
+
+let queueRunning = false;
+async function checkMany(ids) {
+  if (queueRunning) return;
+  queueRunning = true; $('#btnCheckAll').disabled = true;
+  const todo = [...ids]; let done = 0;
+  const worker = async () => {
+    while (todo.length) {
+      await checkOne(todo.shift());
+      $('#mCheck').textContent = `Prüfe Websites… ${++done}/${ids.length}`;
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  $('#mCheck').textContent = `${ids.length} geprüft.`;
+  queueRunning = false; $('#btnCheckAll').disabled = false;
+}
+
+// ---- Ereignisse
+$('#fSearch').addEventListener('submit', async e => {
+  e.preventDefault();
+  const m = $('#mSearch'), b = $('#btnSearch'), ort = $('#sOrt').value.trim();
+  try { localStorage.setItem('lf_ort', ort); } catch (e) {}
+  m.className = 'msg'; m.innerHTML = '<span class="spin"></span> Suche läuft…';
+  b.disabled = true;
+  const before = new Set(LEADS.map(l => l.id));
+  try {
+    const r = await api('/api/search', {method: 'POST', body: {branche: $('#sBranche').value, ort, radius: $('#sRadius').value}});
+    m.textContent = `${r.gefunden} Betriebe gefunden, davon ${r.neu} neu. (${r.ort})`;
+    await load();
+    const neu = LEADS.filter(l => !before.has(l.id)).map(l => l.id);
+    if (neu.length && $('#autoCheck').checked) checkMany(neu);
+  } catch (err) { m.className = 'msg err'; m.textContent = err.message; }
+  b.disabled = false;
+});
+
+$('#btnManual').addEventListener('click', async () => {
+  const items = $('#manual').value.split('\n').map(z => z.split(';').map(s => s.trim())).filter(p => p[0])
+    .map(([name, ort, website, telefon]) => ({name, ort, website, telefon}));
+  if (!items.length) return;
+  try {
+    const r = await api('/api/leads', {method: 'POST', body: {items}});
+    $('#manual').value = ''; $('#mManual').className = 'msg'; $('#mManual').textContent = `${r.ids.length} hinzugefügt.`;
+    await load(); checkMany(r.ids);
+  } catch (err) { $('#mManual').className = 'msg err'; $('#mManual').textContent = err.message; }
+});
+
+$('#btnCheckAll').addEventListener('click', () => {
+  const ids = visible().filter(l => !l.kategorie).map(l => l.id);
+  if (!ids.length) { $('#mCheck').textContent = 'Nichts Ungeprüftes in dieser Ansicht.'; return; }
+  checkMany(ids);
+});
+
+$('#btnKiAll').addEventListener('click', async () => {
+  if (!META.ki.bereit) { alert(META.ki.grund); return; }
+  const ids = visible().filter(l => l.kategorie && l.kategorie !== 'ignoriert' && !l.ki).map(l => l.id);
+  if (!ids.length) { $('#mCheck').textContent = 'Alle geprüften Betriebe in dieser Ansicht sind schon bewertet.'; return; }
+  if (!confirm(`${ids.length} Betriebe mit Claude bewerten?\nKosten ca. 0,05–0,10 $ pro Betrieb (zusammen etwa ${(ids.length * 0.08).toFixed(2).replace('.', ',')} $).`)) return;
+  const btn = $('#btnKiAll'); btn.disabled = true;
+  const todo = [...ids]; let done = 0, fehler = 0;
+  const worker = async () => {
+    while (todo.length) {
+      if (!await kiOne(todo.shift())) fehler++;
+      $('#mCheck').textContent = `Claude bewertet… ${++done}/${ids.length}`;
+    }
+  };
+  await Promise.all([worker(), worker()]);
+  $('#mCheck').textContent = `${ids.length - fehler} bewertet${fehler ? `, ${fehler} fehlgeschlagen` : ''}.`;
+  btn.disabled = false;
+});
+
+$('#stats').addEventListener('click', e => { const t = e.target.closest('[data-f]'); if (t) { filter = t.dataset.f; render(); } });
+['#q', '#fStatus', '#fBranche', '#showIgn'].forEach(s => $(s).addEventListener('input', render));
+document.querySelector('thead').addEventListener('click', e => {
+  const k = e.target.dataset.sort; if (!k) return;
+  sort = {k, dir: sort.k === k ? -sort.dir : (k === 'score' ? -1 : 1)}; render();
+});
+
+$('#tbody').addEventListener('click', async e => {
+  const act = e.target.closest('[data-act]');
+  if (act) {
+    const id = +act.dataset.id;
+    if (act.dataset.act === 'check') checkOne(id);
+    if (act.dataset.act === 'ki') kiOne(id);
+    if (act.dataset.act === 'del' && confirm('Eintrag endgültig löschen?')) {
+      await api(`/api/leads/${id}`, {method: 'DELETE'});
+      LEADS = LEADS.filter(l => l.id !== id); open = null; render();
+    }
+    return;
+  }
+  if (e.target.closest('select, input, textarea, a, button')) return;
+  const tr = e.target.closest('tr.main');
+  if (tr) { open = open === +tr.dataset.id ? null : +tr.dataset.id; render(); }
+});
+
+$('#tbody').addEventListener('change', async e => {
+  const t = e.target;
+  if (t.dataset.status) replace(await api(`/api/leads/${t.dataset.status}`, {method: 'PATCH', body: {status: t.value}}));
+  else if (t.dataset.field) replace(await api(`/api/leads/${t.dataset.id}`, {method: 'PATCH', body: {[t.dataset.field]: t.value}}));
+  else return;
+  render();
+});
+
+$('#btnSettings').addEventListener('click', () => {
+  const f = $('#fSettings');
+  for (const [k, v] of Object.entries(META.settings)) if (f.elements[k]) f.elements[k].value = v;
+  f.elements.anthropic_key.value = '';
+  $('#kiHinweis').textContent = META.settings.anthropic_key_hinweis ? `Schlüssel gespeichert (${META.settings.anthropic_key_hinweis}). Feld leer lassen, um ihn zu behalten.` : 'Nur nötig für „Mit Claude bewerten“. Bleibt auf diesem Rechner.';
+  $('#dlgSettings').showModal();
+});
+$('#dlgSettings').addEventListener('close', async () => {
+  if ($('#dlgSettings').returnValue !== 'save') return;
+  const r = await api('/api/settings', {method: 'POST', body: Object.fromEntries(new FormData($('#fSettings')))});
+  META.settings = r.settings; META.ki = r.ki; render();
+});
+
+function fatal(html) {
+  document.querySelector('main').insertAdjacentHTML('afterbegin',
+    `<div style="background:var(--brick-t);color:var(--brick);border-radius:14px;padding:16px 18px;margin-bottom:16px;font-size:15px">${html}</div>`);
+  document.querySelectorAll('main button').forEach(b => b.disabled = true);
+}
+if (location.protocol === 'file:') {
+  fatal(`<b>Das Dashboard wurde direkt als Datei geöffnet – so funktioniert es nicht.</b><br>
+    Bitte dieses Fenster schließen und im Ordner <b>start-windows.bat</b> (Mac: <b>start-mac.command</b>) doppelklicken.
+    Der Browser öffnet sich dann automatisch mit der Adresse <code>http://127.0.0.1:8765</code>.`);
+} else {
+  init().catch(e => fatal(/fetch|NetworkError/i.test(e.message)
+    ? '<b>Keine Verbindung zum Lead-Finder.</b><br>Läuft das schwarze Fenster (start-windows.bat) noch? Falls nicht, neu starten und diese Seite neu laden.'
+    : `<b>Fehler:</b> ${esc(e.message)}`));
+}
+</script>
+</body>
+</html>
