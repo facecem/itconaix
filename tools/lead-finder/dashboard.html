@@ -15,7 +15,7 @@ header .in{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;align-i
 .logo{font-weight:800;font-size:20px;letter-spacing:-.04em}.logo span{color:var(--teal)}.logo small{font-weight:600;color:var(--muted);letter-spacing:0;font-size:14px;margin-left:8px}
 header .sp{flex:1}
 main{max-width:1280px;margin:0 auto;padding:20px}
-.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap;text-decoration:none;display:inline-block;color:var(--ink)}
 .btn:hover{border-color:var(--ink)}
 .btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}.btn.pri:hover{background:var(--navy)}
 .btn.sm{padding:5px 10px;font-size:13px;border-radius:8px}
@@ -23,7 +23,7 @@ main{max-width:1280px;margin:0 auto;padding:20px}
 .btn:disabled{opacity:.5;cursor:default}
 .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
-.card h2{margin:0 0 4px;font-size:16px;letter-spacing:-.01em}
+.card h2{margin:0 0 12px;font-size:16px;letter-spacing:-.01em}
 .card p.sub{margin:0 0 12px;color:var(--muted);font-size:13.5px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
@@ -78,7 +78,7 @@ dialog h2{margin:0 0 6px}
 
 <main>
   <details class="legal">
-    <summary>⚖️ Bevor ihr Kontakt aufnehmt – kurz die Regeln (Deutschland)</summary>
+    <summary>⚖️ Regeln für die Kontaktaufnahme</summary>
     <ul>
       <li><b>Keine Werbe-E-Mails ohne Einwilligung</b> – auch nicht an Firmen (§ 7 UWG). Abmahngefahr.</li>
       <li><b>Brief per Post</b> und <b>persönlicher Besuch</b> sind erlaubt. Der Button „Bericht“ erzeugt dafür ein druckfertiges Anschreiben.</li>
@@ -90,26 +90,24 @@ dialog h2{margin:0 0 6px}
 
   <div class="grid">
     <section class="card">
-      <h2>1 · Betriebe suchen (OpenStreetMap)</h2>
-      <p class="sub">Kostenlos, ohne Anmeldung. Danach werden die Websites automatisch geprüft.</p>
+      <h2>Betriebe suchen</h2>
       <form id="fSearch" class="row">
         <select id="sBranche" required></select>
-        <input id="sOrt" placeholder="Ort, z. B. Aachen" required style="flex:1;min-width:140px">
+        <input id="sOrt" placeholder="Ort" required style="flex:1;min-width:140px">
         <select id="sRadius" title="Umkreis">
           <option value="3">3 km</option><option value="5">5 km</option><option value="10" selected>10 km</option><option value="20">20 km</option><option value="30">30 km</option>
         </select>
         <button class="btn pri" id="btnSearch">Suchen</button>
       </form>
       <label style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:13.5px;color:var(--ink-2)">
-        <input type="checkbox" id="autoCheck" checked style="width:auto"> Neue Treffer direkt prüfen
+        <input type="checkbox" id="autoCheck" checked style="width:auto"> Direkt prüfen
       </label>
       <div class="msg" id="mSearch"></div>
     </section>
 
     <section class="card">
-      <h2>2 · Selbst eintragen (z. B. aus Google Maps)</h2>
-      <p class="sub">Eine Zeile pro Betrieb: <code>Name; Ort; Website; Telefon</code> – Website und Telefon optional.</p>
-      <textarea id="manual" rows="3" placeholder="Malerbetrieb Schmitz; Würselen&#10;Friseur Haarscharf; Aachen; www.haarscharf-aachen.de; 0241 123456"></textarea>
+      <h2>Selbst eintragen</h2>
+      <textarea id="manual" rows="3" placeholder="Name; Ort; Website; Telefon  (eine Zeile pro Betrieb)"></textarea>
       <div class="row" style="margin-top:8px"><button class="btn pri" id="btnManual">Hinzufügen &amp; prüfen</button></div>
       <div class="msg" id="mManual"></div>
     </section>
@@ -140,10 +138,9 @@ dialog h2{margin:0 0 6px}
 
 <dialog id="dlgSettings">
   <form method="dialog" id="fSettings">
-    <h2>Absender für Berichte</h2>
-    <p class="sub" style="color:var(--muted);margin:0 0 6px;font-size:13.5px">Erscheint im Kopf und unter dem Anschreiben.</p>
+    <h2>Absender</h2>
     <label class="f">Firma<input name="firma"></label>
-    <label class="f">Ansprechpartner<input name="ansprechpartner" placeholder="Vor- und Nachname"></label>
+    <label class="f">Ansprechpartner<input name="ansprechpartner"></label>
     <label class="f">Telefon<input name="telefon"></label>
     <label class="f">E-Mail<input name="email"></label>
     <label class="f">Website<input name="web"></label>
@@ -219,7 +216,7 @@ function render() {
 
   const rows = visible();
   if (!rows.length) {
-    $('#tbody').innerHTML = `<tr><td colspan="5" class="empty">${LEADS.length ? 'Keine Treffer für diesen Filter.' : 'Noch keine Betriebe – oben eine Suche starten oder selbst eintragen.'}</td></tr>`;
+    $('#tbody').innerHTML = `<tr><td colspan="5" class="empty">${LEADS.length ? 'Keine Treffer für diesen Filter.' : 'Noch keine Betriebe.'}</td></tr>`;
     return;
   }
   $('#tbody').innerHTML = rows.map(l => {
@@ -250,14 +247,14 @@ function detail(l, url) {
       ${bef}
       <div class="row">
         <button class="btn sm" data-act="check" data-id="${l.id}">${l.kategorie ? 'Neu prüfen' : 'Jetzt prüfen'}</button>
-        <a class="btn sm" href="/api/leads/${l.id}/report" target="_blank" rel="noopener">Bericht / Anschreiben</a>
-        <a class="btn sm" href="${maps}" target="_blank" rel="noopener">In Google Maps ansehen</a>
+        <a class="btn sm" href="/api/leads/${l.id}/report" target="_blank" rel="noopener">Anschreiben</a>
+        <a class="btn sm" href="${maps}" target="_blank" rel="noopener">Google Maps</a>
         ${url ? `<a class="btn sm" href="${esc(/^https?:/i.test(url) ? url : 'https://' + url)}" target="_blank" rel="noopener">Website öffnen</a>` : ''}
         <button class="btn sm danger" data-act="del" data-id="${l.id}">Löschen</button>
       </div>
     </div>
     <div>
-      <label class="f">Website (falls in Maps eine steht – eintragen und neu prüfen)<input data-field="website" data-id="${l.id}" value="${esc(l.website)}"></label>
+      <label class="f">Website<input data-field="website" data-id="${l.id}" value="${esc(l.website)}"></label>
       <label class="f">Telefon<input data-field="telefon" data-id="${l.id}" value="${esc(l.telefon)}"></label>
       <label class="f">E-Mail<input data-field="email" data-id="${l.id}" value="${esc(l.email)}"></label>
       <label class="f">Notiz<textarea rows="3" data-field="notiz" data-id="${l.id}">${esc(l.notiz)}</textarea></label>
@@ -295,7 +292,7 @@ $('#fSearch').addEventListener('submit', async e => {
   e.preventDefault();
   const m = $('#mSearch'), b = $('#btnSearch'), ort = $('#sOrt').value.trim();
   try { localStorage.setItem('lf_ort', ort); } catch (e) {}
-  m.className = 'msg'; m.innerHTML = '<span class="spin"></span> Suche in OpenStreetMap… (meist unter einer Minute; sind die Server ausgelastet, probiert das Tool automatisch weitere)';
+  m.className = 'msg'; m.innerHTML = '<span class="spin"></span> Suche läuft…';
   b.disabled = true;
   const before = new Set(LEADS.map(l => l.id));
   try {

@@ -21,11 +21,11 @@ Kostenlos, ohne Kreditkarte, alle Daten bleiben auf eurem Rechner (`leads.db`).
    - Website vorhanden → Handy-tauglich? HTTPS? Impressum? Copyright-Jahr? veraltete Technik?
      Meta-Daten? Ladezeit? Google PageSpeed (Handy).
 4. **Score 0–100:** je höher, desto dringender braucht der Betrieb eine neue Seite (100 = keine Website).
-5. Zeile anklicken → Befunde, Notizen, **„Bericht / Anschreiben“** (druckfertiger Brief als PDF), Link zu Google Maps.
+5. Zeile anklicken → Befunde, Notizen, **„Anschreiben“** (druckfertiger Brief als PDF), Link zu Google Maps.
 6. Status pflegen: Neu → Interessant → Angeschrieben → Termin → Kunde.
 7. **CSV-Export** öffnet sich in Excel.
 
-Tipp: Vor dem Anschreiben einmal „In Google Maps ansehen“ klicken – OpenStreetMap kennt nicht jede Website.
+Tipp: Vor dem Anschreiben einmal „Google Maps“ klicken – OpenStreetMap kennt nicht jede Website.
 Steht dort eine, ins Feld „Website“ eintragen und „Neu prüfen“.
 
 ## Rechtliches (kurz)
