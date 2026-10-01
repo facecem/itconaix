@@ -366,7 +366,20 @@ $('#dlgSettings').addEventListener('close', async () => {
   META.settings = await api('/api/settings', {method: 'POST', body: Object.fromEntries(new FormData($('#fSettings')))});
 });
 
-init().catch(e => { document.body.insertAdjacentHTML('afterbegin', `<p class="msg err" style="padding:20px">Fehler: ${esc(e.message)}</p>`); });
+function fatal(html) {
+  document.querySelector('main').insertAdjacentHTML('afterbegin',
+    `<div style="background:var(--brick-t);color:var(--brick);border-radius:14px;padding:16px 18px;margin-bottom:16px;font-size:15px">${html}</div>`);
+  document.querySelectorAll('main button').forEach(b => b.disabled = true);
+}
+if (location.protocol === 'file:') {
+  fatal(`<b>Das Dashboard wurde direkt als Datei geöffnet – so funktioniert es nicht.</b><br>
+    Bitte dieses Fenster schließen und im Ordner <b>start-windows.bat</b> (Mac: <b>start-mac.command</b>) doppelklicken.
+    Der Browser öffnet sich dann automatisch mit der Adresse <code>http://127.0.0.1:8765</code>.`);
+} else {
+  init().catch(e => fatal(/fetch|NetworkError/i.test(e.message)
+    ? '<b>Keine Verbindung zum Lead-Finder.</b><br>Läuft das schwarze Fenster (start-windows.bat) noch? Falls nicht, neu starten und diese Seite neu laden.'
+    : `<b>Fehler:</b> ${esc(e.message)}`));
+}
 </script>
 </body>
 </html>
