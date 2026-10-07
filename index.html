@@ -326,7 +326,8 @@
   .end h2{font-size:clamp(3rem,9vw,7.4rem);letter-spacing:-.05em;line-height:.95;text-align:center}
   .end h2 .serif{background:linear-gradient(90deg,#7FC3CB,#E8C98A 60%,#E58A6E);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.05em}
   .end .lead{text-align:center;color:#AEB3BF;margin:22px auto 0;max-width:46ch;font-size:1.1rem}
-  .contact{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+  .contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:56px}
+  .contact [hidden]{display:none}
   .contact a,.contact div{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;transition:background .3s}
   .contact a:hover{background:rgba(255,255,255,.1)}
   .contact small{display:block;color:#8D93A0;font-size:13px;font-weight:600;margin-bottom:6px}
@@ -694,7 +695,7 @@
         <div class="it"><button aria-expanded="false">Für welche Unternehmen arbeitet ihr?<span class="pm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button><div class="body"><div><p>Vor allem für kleine und mittlere Betriebe in Aachen und der Region: Praxen, Kanzleien, Handwerk, Handel und Dienstleister.</p></div></div></div>
         <div class="it"><button aria-expanded="false">Was kostet die Zusammenarbeit?<span class="pm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button><div class="body"><div><p>Websites starten ab 500 €, IT-Betreuung ab 39 € pro Arbeitsplatz im Monat. Für Software bekommt ihr nach dem Erstgespräch ein Festpreisangebot.</p></div></div></div>
         <div class="it"><button aria-expanded="false">Wie schnell könnt ihr starten?<span class="pm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button><div class="body"><div><p>Meist innerhalb weniger Tage. Websites sind in der Regel nach drei bis sechs Wochen fertig, größere Software-Projekte planen wir individuell.</p></div></div></div>
-        <div class="it"><button aria-expanded="false">Was passiert, wenn mal etwas ausfällt?<span class="pm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button><div class="body"><div><p>Betreuungskunden erreichen uns über eine direkte Nummer. Wir reagieren an Werktagen innerhalb von vier Stunden und kommen bei Bedarf vorbei.</p></div></div></div>
+        <div class="it"><button aria-expanded="false">Was passiert, wenn mal etwas ausfällt?<span class="pm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button><div class="body"><div><p>Betreuungskunden haben bei uns feste Ansprechpartner, die ihre Systeme kennen. Wir kümmern uns an Werktagen schnell um Störungen und kommen bei Bedarf vorbei.</p></div></div></div>
         <div class="it"><button aria-expanded="false">Wo liegen unsere Daten?<span class="pm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button><div class="body"><div><p>Auf Servern in Deutschland. Ihr bekommt alle Zugangsdaten und die komplette Dokumentation.</p></div></div></div>
       </div>
     </div>
@@ -709,7 +710,7 @@
     <p class="lead rv">Erzählt uns, was euch gerade beschäftigt. Wir melden uns am selben Werktag.</p>
     <div class="contact rv">
       <a data-cfg-mail href="mailto:hallo@itconaix.de"><small>E-Mail</small><b data-cfg="email">hallo@itconaix.de</b></a>
-      <a data-cfg-tel><small>Telefon</small><b data-cfg="telefon"></b></a>
+      <a data-cfg-tel data-cfg-if="telefon"><small>Telefon</small><b data-cfg="telefon"></b></a>
       <div><small>Adresse</small><b><span data-cfg="strasse"></span>, <span data-cfg="plzOrt"></span></b></div>
     </div>
     <div class="acts rv">
@@ -812,7 +813,7 @@
           <div class="full err" id="mm-err" role="alert"></div>
         </div>
         <div class="bk-row"><button type="submit" class="btn btn-dark">Nachricht senden</button></div>
-        <p class="bk-note">Oder direkt: <a data-cfg-mail href="mailto:hallo@itconaix.de" style="text-decoration:underline"><span data-cfg="email">hallo@itconaix.de</span></a> · <a data-cfg-tel style="text-decoration:underline"><span data-cfg="telefon"></span></a></p>
+        <p class="bk-note">Oder direkt: <a data-cfg-mail href="mailto:hallo@itconaix.de" style="text-decoration:underline"><span data-cfg="email">hallo@itconaix.de</span></a><span data-cfg-if="telefon"> · <a data-cfg-tel style="text-decoration:underline"><span data-cfg="telefon"></span></a></span></p>
       </form>
 
       <!-- Optional: external booking tool (Calendly / Cal.com) -->

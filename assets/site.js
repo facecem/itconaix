@@ -9,15 +9,15 @@
    ===================================================================== */
 window.ITC_CONFIG = {
   firma:        'IT conAIX',
-  rechtsform:   '[Rechtsform, z. B. GbR oder Einzelunternehmen]',
-  inhaber:      '[Vor- und Nachname aller Inhaber bzw. Gesellschafter]',
-  strasse:      '[Straße und Hausnummer]',
-  plzOrt:       '[PLZ] Aachen',
-  telefon:      '[Telefonnummer, z. B. 0241 123456]',
+  rechtsform:   'GbR',
+  inhaber:      'Hezcem Sahin und Halil Doganay',   /* alle Gesellschafter der GbR */
+  strasse:      'Alexanderstraße 28',
+  plzOrt:       '52062 Aachen',
+  telefon:      '',                          /* leer = alle Telefon-Angaben auf der Seite werden ausgeblendet */
   email:        'hallo@itconaix.de',        /* bitte prüfen: existiert diese Adresse? */
   ustId:        '',                          /* z. B. 'DE123456789' – leer lassen, wenn keine vorhanden */
   register:     '',                          /* z. B. 'Amtsgericht Aachen, HRB 12345' – leer bei GbR/Einzelunternehmen */
-  verantwortlich: '[Vor- und Nachname, Anschrift wie oben]',  /* inhaltlich Verantwortlicher nach § 18 Abs. 2 MStV */
+  verantwortlich: 'Hezcem Sahin, Alexanderstraße 28, 52062 Aachen',  /* inhaltlich Verantwortlicher nach § 18 Abs. 2 MStV */
 
   /* Online-Terminbuchung (optional):
      leer lassen  -> eigener Kalender, Anfrage geht per E-Mail raus, keine Daten an Dritte.
@@ -40,7 +40,7 @@ window.ITC_CONFIG = {
       el.textContent=v; el.classList.toggle('todo',isTodo(v));
     });
     document.querySelectorAll('[data-cfg-mail]').forEach(function(el){el.href='mailto:'+C.email;});
-    document.querySelectorAll('[data-cfg-tel]').forEach(function(el){ if(isTodo(C.telefon)){el.removeAttribute('href');} else el.href=telHref(C.telefon);});
+    document.querySelectorAll('[data-cfg-tel]').forEach(function(el){ if(!C.telefon||isTodo(C.telefon)){el.removeAttribute('href');} else el.href=telHref(C.telefon);});
     document.querySelectorAll('[data-cfg-if]').forEach(function(el){el.hidden=!C[el.dataset.cfgIf];});
     document.querySelectorAll('[data-cfg-ifnot]').forEach(function(el){el.hidden=!!C[el.dataset.cfgIfnot];});
   }

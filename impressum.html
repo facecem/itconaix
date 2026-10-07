@@ -27,7 +27,7 @@
   <div class="box">
     <address>
       <span data-cfg="firma">IT conAIX</span> <span data-cfg="rechtsform"></span><br>
-      <span data-cfg="inhaber"></span><br>
+      vertreten durch die Gesellschafter <span data-cfg="inhaber"></span><br>
       <span data-cfg="strasse"></span><br>
       <span data-cfg="plzOrt"></span><br>
       Deutschland
@@ -36,7 +36,7 @@
 
   <h2>Kontakt</h2>
   <dl>
-    <dt>Telefon</dt><dd><a data-cfg-tel><span data-cfg="telefon"></span></a></dd>
+    <dt data-cfg-if="telefon">Telefon</dt><dd data-cfg-if="telefon"><a data-cfg-tel><span data-cfg="telefon"></span></a></dd>
     <dt>E-Mail</dt><dd><a data-cfg-mail><span data-cfg="email"></span></a></dd>
   </dl>
 
