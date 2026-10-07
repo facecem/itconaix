@@ -1,0 +1,46 @@
+# Lädt die Website bei jeder Änderung auf main per FTPS zu Hetzner hoch (Ordner public_html).
+# Benötigte Repository-Secrets (Settings → Secrets and variables → Actions):
+#   FTP_SERVER    z. B. www790.your-server.de
+#   FTP_USERNAME  eigener FTP-Benutzer aus der konsoleH, beschränkt auf public_html
+#   FTP_PASSWORD  dessen Passwort
+# Optionale Repository-Variable FTP_DIR: Zielordner relativ zum FTP-Benutzer.
+#   Standard './' (Benutzer ist auf public_html beschränkt). Beim Haupt-FTP-Benutzer 'public_html/' eintragen.
+name: Deploy zu Hetzner
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-hetzner
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAS_SECRETS: ${{ secrets.FTP_SERVER != '' && secrets.FTP_USERNAME != '' && secrets.FTP_PASSWORD != '' }}
+    steps:
+      - name: Hinweis, falls Zugangsdaten fehlen
+        if: env.HAS_SECRETS != 'true'
+        run: echo "::notice::FTP-Secrets noch nicht eingetragen – Upload zu Hetzner wird übersprungen."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_SECRETS == 'true'
+
+      - name: Upload per FTPS
+        if: env.HAS_SECRETS == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          server-dir: ${{ vars.FTP_DIR || './' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            README.md

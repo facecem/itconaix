@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://facecem.github.io/itconaix/sitemap.xml
+Sitemap: https://itconaix.de/sitemap.xml
