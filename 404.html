@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seite nicht gefunden – IT conAIX</title>
+<meta name="robots" content="noindex">
+<script>
+  /* GitHub zeigt diese Seite unter jeder falschen Adresse an, auch tief verschachtelt.
+     Damit Bilder, Schriften und Links überall stimmen, setzen wir die Basis-Adresse selbst:
+     unter facecem.github.io liegt die Seite in /itconaix/, auf der eigenen Domain im Wurzelverzeichnis. */
+  document.write('<base href="' + (/\.github\.io$/.test(location.hostname) ? '/itconaix/' : '/') + '">');
+</script>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js"></script>
+<style>
+  .nf{min-height:calc(100vh - 140px);display:grid;place-items:center;padding:56px 24px 72px;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px}
+  .nf-in{max-width:680px;text-align:center}
+  .nf svg.wire{width:min(440px,100%);height:auto;display:block;margin:0 auto 34px;overflow:visible}
+  .nf .code{font-weight:800;font-size:15px;letter-spacing:.02em;color:var(--brick);background:var(--brick-t);display:inline-block;padding:5px 12px;border-radius:999px}
+  .nf h1{font-size:clamp(2.4rem,7vw,4.4rem);font-weight:700;letter-spacing:-.045em;line-height:1.02;margin:18px 0 0;text-wrap:balance}
+  .nf h1 .serif{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em}
+  .nf p{color:var(--ink-2);font-size:1.12rem;margin:18px auto 0;max-width:46ch}
+  .nf .path{margin-top:10px;font-size:14px;color:var(--muted);word-break:break-all}
+  .nf .path code{font-family:inherit;font-weight:700;color:var(--ink-2);background:#F1F2F5;border-radius:6px;padding:2px 7px}
+  .nf .acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+  .nf .btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:15px;padding:13px 20px;border-radius:14px;text-decoration:none;transition:background .2s,transform .2s var(--ease)}
+  .nf .btn svg{transition:transform .25s var(--ease)}
+  .nf .btn:hover svg{transform:translate(2px,-2px)}
+  .nf .btn-dark{background:var(--ink);color:#fff}
+  .nf .btn-dark:hover{background:var(--navy);transform:translateY(-1px)}
+  .nf .btn-light{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .nf .btn-light:hover{background:#F1F2F5}
+  .nf .quick{margin-top:30px;display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;font-size:15px;font-weight:600}
+  .nf .quick a{color:var(--ink-2);text-decoration:none;border-bottom:1.5px solid var(--line);padding-bottom:2px;transition:color .2s,border-color .2s}
+  .nf .quick a:hover{color:var(--ink);border-color:var(--teal)}
+
+  /* abgerissene Leiterbahn: die Enden flackern, Funken blinken – nur Helligkeit, keine Bewegung */
+  .wire .end{animation:flicker 1.8s steps(1) infinite}
+  .wire .end.b{animation-delay:.9s}
+  .wire .spark{animation:spark 1.6s ease-in-out infinite;opacity:0}
+  .wire .spark:nth-of-type(2){animation-delay:.25s}.wire .spark:nth-of-type(3){animation-delay:.55s}
+  .wire .spark:nth-of-type(4){animation-delay:.8s}.wire .spark:nth-of-type(5){animation-delay:1.05s}
+  .wire .node{animation:breathe 3s ease-in-out infinite}
+  .wire .node.b{animation-delay:1.5s}
+  @keyframes flicker{0%,100%{opacity:1}12%{opacity:.25}18%{opacity:1}55%{opacity:.4}60%{opacity:1}}
+  @keyframes spark{0%,100%{opacity:0}40%{opacity:1}}
+  @keyframes breathe{50%{opacity:.6}}
+  @media(prefers-reduced-motion:reduce){.wire .end,.wire .node{animation:none}.wire .spark{animation-duration:3.2s}}
+</style>
+</head>
+<body class="legal-body">
+
+<header class="legal-top">
+  <div class="in">
+    <a class="logo" href="./">IT&nbsp;con<span>AI</span>X</a>
+    <a class="back" href="./">Zur Startseite</a>
+  </div>
+</header>
+
+<main class="nf">
+  <div class="nf-in">
+    <svg class="wire" viewBox="0 0 440 120" aria-hidden="true">
+      <!-- Grundlinie wie im Hero: Leiterbahn mit Knick -->
+      <path d="M40 90 H150 V40 H188" fill="none" stroke="#14264A" stroke-opacity=".22" stroke-width="3" stroke-linecap="square"/>
+      <path d="M252 40 H300 V90 H400" fill="none" stroke="#14264A" stroke-opacity=".22" stroke-width="3" stroke-linecap="square"/>
+      <!-- leuchtende Abschnitte bis zur Bruchstelle -->
+      <path class="end" d="M150 40 H188" fill="none" stroke="#2E7C86" stroke-width="3.5" stroke-linecap="square"/>
+      <path class="end b" d="M252 40 H300" fill="none" stroke="#B5462C" stroke-width="3.5" stroke-linecap="square"/>
+      <!-- Funken an der Bruchstelle -->
+      <rect class="spark" x="198" y="28" width="5" height="5" fill="#D9A441"/>
+      <rect class="spark" x="210" y="46" width="4" height="4" fill="#2E7C86"/>
+      <rect class="spark" x="224" y="30" width="5" height="5" fill="#B5462C"/>
+      <rect class="spark" x="237" y="48" width="4" height="4" fill="#D9A441"/>
+      <rect class="spark" x="216" y="22" width="3" height="3" fill="#14264A"/>
+      <!-- Knoten -->
+      <rect class="node" x="30" y="80" width="20" height="20" rx="3" fill="#14264A"/>
+      <rect class="node b" x="390" y="80" width="20" height="20" rx="3" fill="#2E7C86"/>
+      <rect x="143" y="33" width="14" height="14" rx="2" fill="#D9A441"/>
+      <rect x="293" y="33" width="14" height="14" rx="2" fill="#B5462C"/>
+    </svg>
+
+    <span class="code">Fehler 404</span>
+    <h1>Hier ist die <span class="serif">Verbindung abgerissen.</span></h1>
+    <p>Die Seite, die ihr sucht, gibt es nicht oder nicht mehr. Vielleicht hat sich ein Tippfehler in die Adresse geschlichen.</p>
+    <p class="path" id="path" hidden>Aufgerufen: <code id="pathCode"></code></p>
+
+    <div class="acts">
+      <a class="btn btn-dark" href="./">Zur Startseite
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <a class="btn btn-light" href="./#termin">Projekt besprechen</a>
+    </div>
+
+    <nav class="quick" aria-label="Schnellzugriff">
+      <a href="./#leistungen">Leistungen</a>
+      <a href="./#arbeiten">Referenzen</a>
+      <a href="./#preise">Preise</a>
+      <a href="./#faq">FAQ</a>
+      <a href="./#kontakt">Kontakt</a>
+    </nav>
+  </div>
+</main>
+
+<footer class="legal-foot">
+  <div class="in">
+    <span>© 2026 IT conAIX, Aachen</span>
+    <a href="./">Startseite</a>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+    <button type="button" data-cookie-settings>Cookie-Einstellungen</button>
+  </div>
+</footer>
+
+<script>
+  /* aufgerufene Adresse anzeigen, damit man Tippfehler sieht */
+  (function(){
+    var p=decodeURI(location.pathname).replace(/^\/itconaix/,'')||'/';
+    if(p!=='/' && !/404\.html$/.test(p)){document.getElementById('pathCode').textContent=p;document.getElementById('path').hidden=false;}
+  })();
+</script>
+</body>
+</html>
