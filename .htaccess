@@ -12,6 +12,9 @@ Options -Indexes
   RewriteEngine On
   RewriteCond %{HTTP_HOST} ^www\.itconaix\.de$ [NC]
   RewriteRule ^ https://itconaix.de%{REQUEST_URI} [R=301,L]
+
+  # Browser fragen von sich aus nach /favicon.ico – auf das vorhandene SVG-Icon umleiten
+  RewriteRule ^favicon\.ico$ /favicon.svg [L]
 </IfModule>
 
 # Dateitypen
