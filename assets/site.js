@@ -14,7 +14,7 @@ window.ITC_CONFIG = {
   strasse:      'Alexanderstraße 28',
   plzOrt:       '52062 Aachen',
   telefon:      '',                          /* leer = alle Telefon-Angaben auf der Seite werden ausgeblendet */
-  email:        'hallo@itconaix.de',        /* bitte prüfen: existiert diese Adresse? */
+  email:        'info@itconaix.de',
   ustId:        '',                          /* z. B. 'DE123456789' – leer lassen, wenn keine vorhanden */
   register:     '',                          /* z. B. 'Amtsgericht Aachen, HRB 12345' – leer bei GbR/Einzelunternehmen */
   verantwortlich: 'Hezcem Sahin, Alexanderstraße 28, 52062 Aachen',  /* inhaltlich Verantwortlicher nach § 18 Abs. 2 MStV */
