@@ -9,12 +9,16 @@
   /* GitHub zeigt diese Seite unter jeder falschen Adresse an, auch tief verschachtelt.
      Damit Bilder, Schriften und Links überall stimmen, setzen wir die Basis-Adresse selbst:
      unter facecem.github.io liegt die Seite in /itconaix/, auf der eigenen Domain im Wurzelverzeichnis. */
-  document.write('<base href="' + (/\.github\.io$/.test(location.hostname) ? '/itconaix/' : '/') + '">');
+  /* Verweise mit absoluter Basis direkt mitschreiben, damit der Browser sie nicht vorab unter der falschen Adresse sucht */
+  (function(){
+    var b=/\.github\.io$/.test(location.hostname)?'/itconaix/':'/';
+    document.write('<base href="'+b+'">'+
+      '<link rel="icon" href="'+b+'favicon.svg" type="image/svg+xml">'+
+      '<link rel="stylesheet" href="'+b+'assets/fonts.css">'+
+      '<link rel="stylesheet" href="'+b+'assets/site.css">'+
+      '<script src="'+b+'assets/site.js"><\/script>');
+  })();
 </script>
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/site.css">
-<script src="assets/site.js"></script>
 <style>
   .nf{min-height:calc(100vh - 140px);display:grid;place-items:center;padding:56px 24px 72px;
     background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px}
