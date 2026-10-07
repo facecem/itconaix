@@ -195,6 +195,14 @@
   .ref::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
   .ref.r1::before{background:radial-gradient(70% 45% at 100% 100%,var(--ochre-t),transparent 70%)}
   .ref.r2::before{background:radial-gradient(70% 45% at 100% 100%,var(--brick-t),transparent 70%)}
+  .ref.r0::before{background:radial-gradient(60% 80% at 100% 100%,var(--ochre-t),transparent 70%),radial-gradient(50% 60% at 0% 0%,var(--navy-t),transparent 70%)}
+  .ref.wide{grid-column:1/-1;flex-direction:row;align-items:stretch}
+  .ref.wide .shot{flex:1.45;margin:14px 0 14px 14px}
+  .ref.wide .info{flex:1;padding:32px 32px 30px;justify-content:center}
+  .ref.wide h3{font-size:2.2rem}
+  .ref .facts{display:flex;flex-wrap:wrap;gap:6px 18px;margin:4px 0 2px;padding:0;list-style:none;font-size:14.5px;color:var(--ink-2)}
+  .ref .facts li::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;background:var(--ochre);margin-right:8px;vertical-align:middle}
+  @media(max-width:860px){.ref.wide{flex-direction:column}.ref.wide .shot{margin:14px 14px 0}.ref.wide .info{padding:24px 26px 26px}.ref.wide h3{font-size:1.75rem}}
   .ref > *{position:relative;z-index:1}
   .ref .shot{margin:14px 14px 0;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#F1F2F5}
   .ref .bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#F4F5F7;border-bottom:1px solid var(--line)}
@@ -507,7 +515,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
         <div class="trust">
           <span class="faces" aria-hidden="true"><i style="background:linear-gradient(135deg,#14264A,#2E7C86)"></i><i style="background:linear-gradient(135deg,#D9A441,#B5462C)"></i><i style="background:linear-gradient(135deg,#2E7C86,#D9A441)"></i></span>
-          <span>Unter anderem für <b>AS Gebäudetechnik</b> und <b>Roosenboom Baumanagement</b></span>
+          <span>Unter anderem für <b>TI Group</b>, <b>AS Gebäudetechnik</b> und <b>Roosenboom</b></span>
         </div>
       </div>
     </div>
@@ -592,9 +600,27 @@
     <div class="wrap">
       <div class="head rv">
         <h2>Ausgewählte<br><span class="serif">Referenzen</span></h2>
-        <p>Zwei Websites, die wir für Unternehmen aus der Region gebaut haben. Schaut sie euch live an.</p>
+        <p>Websites, die wir für Unternehmen aus der Region gebaut haben. Schaut sie euch live an.</p>
       </div>
       <div class="refs">
+        <a class="ref r0 wide rv" href="https://ti.group" target="_blank" rel="noopener">
+          <div class="shot">
+            <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>ti.group</span></div>
+            <img src="assets/refs/ti-group.webp" width="1440" height="900" loading="lazy" decoding="async"
+              alt="Startseite von ti.group: TI Group, Immobilien, Hotellerie und Gastronomie im Rheinland, mit 3D-Karte der Region Aachen im Hintergrund">
+          </div>
+          <div class="info">
+            <div class="top"><h3>TI Group</h3><span class="where">Würselen</span></div>
+            <p>Mehrseitige Website für das Familienunternehmen aus Immobilien, Hotellerie und Gastronomie. Im Mittelpunkt steht eine interaktive 3D-Karte der Städteregion Aachen.</p>
+            <ul class="facts">
+              <li>Projektseiten mit Referenzobjekten</li>
+              <li>Suchprofil für Ankäufe</li>
+              <li>Kontaktformulare</li>
+            </ul>
+            <div class="rtags"><span class="tag"><i style="background:var(--ochre)"></i>Webdesign</span><span class="tag"><i style="background:var(--navy)"></i>Entwicklung</span><span class="tag"><i style="background:var(--teal)"></i>3D-Karte</span></div>
+            <span class="go">Website ansehen <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+          </div>
+        </a>
         <a class="ref r1 rv" href="https://as-versorgung.de" target="_blank" rel="noopener">
           <div class="shot">
             <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>as-versorgung.de</span></div>
