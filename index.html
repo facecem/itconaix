@@ -405,6 +405,9 @@
   .bk-form input:focus,.bk-form select:focus,.bk-form textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-t)}
   .bk-form textarea{min-height:110px;resize:vertical}
   .bk-form .err{color:var(--brick);font-size:13.5px;font-weight:600;min-height:1em}
+  .bk-form .err a{text-decoration:underline}
+  .hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .btn[disabled]{opacity:.6;cursor:progress}
   .bk-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px}
   .bk-back{border:0;background:#F1F2F5;font:inherit;font-weight:700;font-size:15px;padding:13px 18px;border-radius:14px;cursor:pointer}
   .bk-note{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.5}
@@ -784,6 +787,7 @@
           <div class="full"><label for="bk-th">Worum geht es?</label>
             <select id="bk-th" name="thema"><option>IT-Betreuung</option><option>Website oder Shop</option><option>Software oder App</option><option>Automatisierung und KI</option><option>Etwas anderes</option></select></div>
           <div class="full"><label for="bk-t">Ein, zwei Sätze zum Vorhaben</label><textarea id="bk-t" name="text" placeholder="Was stört gerade, was soll besser werden?"></textarea></div>
+          <div class="hp" aria-hidden="true"><label>Bitte leer lassen <input name="xq_c" tabindex="-1" autocomplete="off"></label></div>
           <div class="full err" id="bk-err" role="alert"></div>
         </div>
         <div class="bk-row">
@@ -796,8 +800,8 @@
       <!-- Termin: step 3, done -->
       <div class="bk-step bk-done" data-step="done" hidden>
         <div class="ok"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
-        <h3 id="bk-done-h">Terminanfrage vorbereitet</h3>
-        <p id="bk-done-p">Euer E-Mail-Programm hat sich mit allen Angaben geöffnet. Sendet die E-Mail ab, dann bestätigen wir den Termin am selben Werktag.</p>
+        <h3 id="bk-done-h">Anfrage gesendet</h3>
+        <p id="bk-done-p">Wir melden uns am selben Werktag bei euch.</p>
         <div class="sum" id="bk-sum"></div>
         <div class="bk-row"><button type="button" class="btn btn-dark" data-close>Fertig</button></div>
       </div>
@@ -809,6 +813,7 @@
           <div><label for="mm-n">Name *</label><input id="mm-n" name="name" autocomplete="name" required></div>
           <div><label for="mm-m">E-Mail *</label><input id="mm-m" name="email" type="email" autocomplete="email" required></div>
           <div class="full"><label for="mm-t">Nachricht *</label><textarea id="mm-t" name="text" required></textarea></div>
+          <div class="hp" aria-hidden="true"><label>Bitte leer lassen <input name="xq_c" tabindex="-1" autocomplete="off"></label></div>
           <div class="full err" id="mm-err" role="alert"></div>
         </div>
         <div class="bk-row"><button type="submit" class="btn btn-dark">Nachricht senden</button></div>
@@ -987,24 +992,69 @@
   }
   function mailto(subject,body){location.href='mailto:'+MAIL+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);}
 
+  /* Anfragen gehen an api/anfrage.php auf dem eigenen Server (Hetzner) und von dort per E-Mail an uns.
+     Läuft die Seite irgendwo ohne PHP (lokal, Vorschau), öffnet sich wie früher das E-Mail-Programm. */
+  var API='api/anfrage.php';
+  function isoDay(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  function done(head,text,sumHtml){
+    document.getElementById('bk-done-h').textContent=head;
+    document.getElementById('bk-done-p').textContent=text;
+    document.getElementById('bk-sum').innerHTML=sumHtml;
+    show('done');
+  }
+  function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+  /* Zeitpunkt merken, an dem jemand anfängt das Formular auszufüllen (Schutz vor Bots) */
+  bk.querySelectorAll('form').forEach(function(f){f.addEventListener('focusin',function(){if(!f.dataset.t0)f.dataset.t0=String(Date.now());});});
+  function submitTo(form,payload,errId,onOk,onFallback){
+    var btn=form.querySelector('button[type="submit"]'),label=btn.textContent,err=document.getElementById(errId);
+    var reset=function(){btn.disabled=false;btn.textContent=label;};
+    btn.disabled=true;btn.textContent='Wird gesendet …';err.textContent='';
+    payload.xq_c=form.elements.xq_c.value;payload.ms=form.dataset.t0?Date.now()-Number(form.dataset.t0):0;
+    fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){
+        if((r.headers.get('content-type')||'').indexOf('json')<0)throw {fallback:true};   /* kein PHP auf diesem Server */
+        return r.json().then(function(j){j.status=r.status;return j;});
+      })
+      .then(function(j){
+        reset();
+        if(j.ok){onOk(j.confirm);form.reset();delete form.dataset.t0;}
+        else err.innerHTML=esc(j.error||'Das hat nicht geklappt.')+(j.status>=429&&String(j.error||'').indexOf(MAIL)<0?' <a href="mailto:'+MAIL+'">'+MAIL+'</a>':'');
+      })
+      .catch(function(x){
+        reset();
+        if(x&&x.fallback){onFallback();return;}
+        err.innerHTML='Keine Verbindung zum Server. Bitte prüft eure Internetverbindung oder schreibt direkt an <a href="mailto:'+MAIL+'">'+MAIL+'</a>.';
+      });
+  }
+
   bk.querySelector('form[data-step="form"]').addEventListener('submit',function(e){
     e.preventDefault();if(!valid(this,'bk-err'))return;
-    var f=this.elements,when=fmtDay(S.day)+', '+S.time+' Uhr';
-    var body='Wunschtermin: '+when+'\nGesprächsart: '+S.kind+'\nThema: '+f.thema.value+
-      '\n\nName: '+f.name.value+(f.firma.value?'\nUnternehmen: '+f.firma.value:'')+'\nE-Mail: '+f.email.value+(f.telefon.value?'\nTelefon: '+f.telefon.value:'')+
-      (f.text.value?'\n\nZum Vorhaben:\n'+f.text.value:'');
-    mailto('Terminanfrage: '+when,body);
-    document.getElementById('bk-done-h').textContent='Terminanfrage vorbereitet';
-    document.getElementById('bk-sum').innerHTML=when+'<br>'+S.kind+' · '+f.thema.value;
-    show('done');
+    var f=this.elements,when=fmtDay(S.day)+', '+S.time+' Uhr',email=f.email.value.trim();
+    var sum=esc(when)+'<br>'+esc(S.kind)+' · '+esc(f.thema.value);
+    submitTo(this,{type:'termin',name:f.name.value,firma:f.firma.value,email:email,telefon:f.telefon.value,thema:f.thema.value,
+        text:f.text.value,kind:S.kind,date:isoDay(S.day),time:S.time},'bk-err',
+      function(confirmed){
+        done('Terminanfrage gesendet','Wir haben eure Anfrage erhalten'+(confirmed?' und euch eine Bestätigung an '+email+' geschickt':'')+'. Wir prüfen den Termin und melden uns am selben Werktag.',sum);
+      },
+      function(){
+        var body='Wunschtermin: '+when+'\nGesprächsart: '+S.kind+'\nThema: '+f.thema.value+
+          '\n\nName: '+f.name.value+(f.firma.value?'\nUnternehmen: '+f.firma.value:'')+'\nE-Mail: '+email+(f.telefon.value?'\nTelefon: '+f.telefon.value:'')+
+          (f.text.value?'\n\nZum Vorhaben:\n'+f.text.value:'');
+        mailto('Terminanfrage: '+when,body);
+        done('Terminanfrage vorbereitet','Euer E-Mail-Programm hat sich mit allen Angaben geöffnet. Sendet die E-Mail ab, dann bestätigen wir den Termin am selben Werktag.',sum);
+      });
   });
   bk.querySelector('form[data-step="msg"]').addEventListener('submit',function(e){
     e.preventDefault();if(!valid(this,'mm-err'))return;
-    var f=this.elements;
-    mailto('Anfrage über die Website',f.text.value+'\n\n'+f.name.value+'\n'+f.email.value);
-    document.getElementById('bk-done-h').textContent='Nachricht vorbereitet';
-    document.getElementById('bk-sum').textContent=f.name.value+' · '+f.email.value;
-    show('done');
+    var f=this.elements,email=f.email.value.trim(),sum=esc(f.name.value)+' · '+esc(email);
+    submitTo(this,{type:'nachricht',name:f.name.value,email:email,text:f.text.value},'mm-err',
+      function(confirmed){
+        done('Nachricht gesendet','Danke! Eure Nachricht ist angekommen'+(confirmed?', eine Bestätigung ist an '+email+' unterwegs':'')+'. Wir melden uns am selben Werktag.',sum);
+      },
+      function(){
+        mailto('Anfrage über die Website',f.text.value+'\n\n'+f.name.value+'\n'+email);
+        done('Nachricht vorbereitet','Euer E-Mail-Programm hat sich geöffnet. Sendet die E-Mail ab, dann melden wir uns am selben Werktag.',sum);
+      });
   });
 
   bk.querySelectorAll('[role="tab"]').forEach(function(t){t.addEventListener('click',function(){
